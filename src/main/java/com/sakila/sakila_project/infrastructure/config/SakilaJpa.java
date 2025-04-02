@@ -1,4 +1,4 @@
-package com.sakila.sakila_project.infraestructure.config;
+package com.sakila.sakila_project.infrastructure.config;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,13 +18,13 @@ import java.util.Objects;
 
 @Configuration
 @EnableJpaRepositories(
-        basePackages = "",
+        basePackages = "com.sakila.sakila_project.infrastructure.adapters.output.repositories.sakila",
         entityManagerFactoryRef = "SakilaEMF",
         transactionManagerRef = "SakilaTM"
 )
 @EnableTransactionManagement
 public class SakilaJpa {
-    @Value("${spring.datasource.sakila.driver-class-name}")
+    @Value("${spring.datasource.sakila.dialect}")
     private String dialect;
 
     @Primary
@@ -39,7 +39,7 @@ public class SakilaJpa {
         return builder
                 .dataSource(dataSource)
                 .persistenceUnit("sakilaDb")
-                .packages("")
+                .packages("com.sakila.sakila_project.domain.sakila")
                 .properties(properties)
                 .build();
     }

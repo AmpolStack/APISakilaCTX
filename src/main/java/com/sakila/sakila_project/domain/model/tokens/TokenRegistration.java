@@ -10,7 +10,7 @@ import java.util.Date;
 @Getter
 @Setter
 @Table(name = "history_rt")
-public class TokenRegister {
+public class TokenRegistration {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_history_rt")

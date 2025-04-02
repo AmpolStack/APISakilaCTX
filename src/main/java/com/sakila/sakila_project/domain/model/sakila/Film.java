@@ -1,4 +1,4 @@
-package com.sakila.sakila_project.domain;
+package com.sakila.sakila_project.domain.model.sakila;
 
 import jakarta.persistence.*;
 import lombok.Getter;
