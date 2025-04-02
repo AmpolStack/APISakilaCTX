@@ -4,18 +4,16 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
+import java.util.Date;
+
 @Setter
-@Entity
-public class film {
+@Getter
+@Entity(name = "language")
+public class Language {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "film_id")
+    @Column(name = "language_id")
     private int id;
-    private String title;
-    private String description;
-    private int release_year;
-    private int language_id;
-
-
+    private String name;
+    private Date last_update;
 }
