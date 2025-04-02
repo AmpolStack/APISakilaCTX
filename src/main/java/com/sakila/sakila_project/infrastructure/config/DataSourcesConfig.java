@@ -1,4 +1,4 @@
-package com.sakila.sakila_project.infraestructure;
+package com.sakila.sakila_project.infraestructure.config;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
