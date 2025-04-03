@@ -17,12 +17,12 @@ import java.util.Map;
 import java.util.Objects;
 
 @Configuration
-@EnableTransactionManagement
 @EnableJpaRepositories(
         basePackages = "com.sakila.sakila_project.infrastructure.adapters.output.repositories.tokens",
         entityManagerFactoryRef = "TokensEMF",
         transactionManagerRef = "TokensTM"
 )
+@EnableTransactionManagement
 public class TokensJpa {
     @Value("${spring.datasource.tokens.dialect}")
     private String dialect;

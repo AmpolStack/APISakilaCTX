@@ -39,7 +39,7 @@ public class SakilaJpa {
         return builder
                 .dataSource(dataSource)
                 .persistenceUnit("sakilaDb")
-                .packages("com.sakila.sakila_project.domain.sakila")
+                .packages("com.sakila.sakila_project.domain.model.sakila")
                 .properties(properties)
                 .build();
     }
