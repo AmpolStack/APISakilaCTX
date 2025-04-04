@@ -57,6 +57,18 @@ public class ActorController {
         }
     }
 
+    @GetMapping("/getAllFilmsWithLanguages2")
+    public ResponseEntity getAllFilmsWithLanguages2() {
+
+        try{
+            var resp = this.filmRepository.findAllWithLanguage();
+            return ResponseEntity.ok(resp);
+        }
+        catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
     @GetMapping("/getAllFilmsWithoutLanguages")
     public ResponseEntity getAllFilmsWithoutLanguages() {
         var resp = this.filmRepository.findAll();
