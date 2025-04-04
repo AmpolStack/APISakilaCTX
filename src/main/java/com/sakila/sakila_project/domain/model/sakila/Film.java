@@ -1,5 +1,6 @@
 package com.sakila.sakila_project.domain.model.sakila;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,14 +20,16 @@ public class Film {
     private String description;
     private int release_year;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "language_id", nullable = false)
     private Language language;
+    // private int language_id;
     private int rental_duration;
-    private double rental_price;
+    private float rental_rate;
     private int length;
     private double replacement_cost;
     private String rating;
     private String special_features;
     private Date last_update;
-    @ManyToMany(fetch = FetchType.LAZY)
-    private Set<Actor> actors;
+//    @ManyToMany(fetch = FetchType.LAZY)
+//    private Set<Actor> actors;
 }
