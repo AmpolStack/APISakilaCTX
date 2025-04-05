@@ -30,7 +30,7 @@ public class ActorController {
     @GetMapping("/getAllActors")
     public ResponseEntity getAllActors() {
         try{
-            var resp = this.actorRepository.findAll();
+            var resp = this.actorRepository.findActors();
             return ResponseEntity.ok(resp);
         }
         catch(Exception e){
