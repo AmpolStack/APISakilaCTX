@@ -1,7 +1,5 @@
 package com.sakila.sakila_project.application.dto;
 
-import com.sakila.sakila_project.domain.model.sakila.Language;
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,7 +7,7 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class MinimalFilmDto {
+public class MinFilmDto {
     private String title;
     private String description;
     private int release_year;

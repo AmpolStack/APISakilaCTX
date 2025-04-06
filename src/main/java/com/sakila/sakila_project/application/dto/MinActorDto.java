@@ -7,7 +7,7 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class MinimalActorDto {
+public class MinActorDto {
     private String first_name;
     private String last_name;
     private Date last_update;

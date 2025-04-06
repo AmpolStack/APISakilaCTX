@@ -1,14 +1,11 @@
 package com.sakila.sakila_project.infrastructure.adapters.input.rest;
 
-import com.sakila.sakila_project.application.dto.ActorWithFilmDto;
-import com.sakila.sakila_project.application.dto.MinimalActorDto;
 import com.sakila.sakila_project.application.maps.ActorDtoMapper;
 import com.sakila.sakila_project.application.maps.MinimalDtoMapper;
 import com.sakila.sakila_project.infrastructure.adapters.output.repositories.sakila.ActorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,7 +38,6 @@ public class ActorController {
     }
 
     @GetMapping("/getActorById")
-    @Transactional
     public ResponseEntity getActorAllInfo(@RequestParam int id) {
         try{
             var actor = this.actorRepository.findById(id);
