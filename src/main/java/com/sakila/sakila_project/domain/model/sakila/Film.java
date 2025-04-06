@@ -21,7 +21,6 @@ public class Film {
     private int release_year;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "language_id", nullable = false)
-    @JsonIgnore
     private Language language;
     // private int language_id;
     private int rental_duration;
