@@ -11,10 +11,4 @@ import java.util.List;
 
 @Repository
 public interface FilmRepository extends JpaRepository<Film, Integer> {
-    @Override
-    List<Film> findAll();
-
-    @EntityGraph(attributePaths = {"language"})
-    @Query("SELECT f FROM film f")
-    List<Film> findAllWithLanguage();
 }
