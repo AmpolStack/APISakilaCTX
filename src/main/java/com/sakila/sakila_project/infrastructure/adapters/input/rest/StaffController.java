@@ -7,10 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -39,4 +36,27 @@ public class StaffController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
+
+    @GetMapping("/getByCredentials")
+    public ResponseEntity getByCredentials(@RequestParam String username, @RequestParam String password){
+        try{
+
+            if(username.isEmpty() || password.isEmpty()){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username or password is empty");
+            }
+
+            var staffOp = this.repository.findStaffByUsernameAndPassword(username, password);
+            if(staffOp.isEmpty()){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Staff not found");
+            }
+
+            var staff = staffOp.get();
+            var map = this.mapper.toMinStaffDto(staff);
+            return ResponseEntity.status(HttpStatus.OK).body(map);
+        }
+        catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
 }

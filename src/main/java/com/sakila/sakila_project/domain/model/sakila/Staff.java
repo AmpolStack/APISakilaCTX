@@ -33,7 +33,7 @@ public class Staff {
     private int active;
     @Column(length = 16)
     private String username;
-    @Column(length = 40)
+    @Column(length = 40, nullable = true)
     private String password;
     private Date last_update;
 }
