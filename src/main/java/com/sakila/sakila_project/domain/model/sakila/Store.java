@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -15,11 +16,7 @@ public class Store {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "store_id")
     private int id;
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "inventory",
-            joinColumns = @JoinColumn(name = "store_id"),
-            inverseJoinColumns = @JoinColumn(name = "film_id"))
-    private List<Film> films;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "store")
+    private Set<Inventory> inventory;
     private Date last_update;
 }

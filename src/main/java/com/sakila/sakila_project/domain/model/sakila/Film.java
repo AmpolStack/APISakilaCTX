@@ -30,6 +30,8 @@ public class Film {
     private String rating;
     private String special_features;
     private Date last_update;
+    @OneToMany(mappedBy = "film")
+    private Set<Inventory> inventory;
 //    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "films")
 //    private Set<Actor> actors;
 }
