@@ -1,7 +1,9 @@
 package com.sakila.sakila_project.application.maps;
 
 import com.sakila.sakila_project.application.dto.MinActorDto;
+import com.sakila.sakila_project.application.dto.MinStaffDto;
 import com.sakila.sakila_project.domain.model.sakila.Actor;
+import com.sakila.sakila_project.domain.model.sakila.Staff;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -9,9 +11,13 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface MinimalDtoMapper {
 
-    public MinActorDto toMinimalActorDto(Actor dto);
+    MinActorDto toMinimalActorDto(Actor dto);
 
-    public List<MinActorDto> toMinimalActorDtoList(List<Actor> dtoList);
+    List<MinActorDto> toMinimalActorDtoList(List<Actor> dtoList);
 
     Actor toActor(MinActorDto actor);
+
+    MinStaffDto toMinStaffDto(Staff staff);
+
+    List<MinStaffDto> toMinStaffDtoList(List<Staff> dtoList);
 }
