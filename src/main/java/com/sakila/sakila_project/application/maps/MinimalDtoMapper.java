@@ -12,4 +12,6 @@ public interface MinimalDtoMapper {
     public MinActorDto toMinimalActorDto(Actor dto);
 
     public List<MinActorDto> toMinimalActorDtoList(List<Actor> dtoList);
+
+    Actor toActor(MinActorDto actor);
 }
