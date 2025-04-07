@@ -1,5 +1,6 @@
 package com.sakila.sakila_project.infrastructure.adapters.input.rest;
 
+import com.sakila.sakila_project.application.custom.Credentials;
 import com.sakila.sakila_project.application.maps.MinimalDtoMapper;
 import com.sakila.sakila_project.domain.model.sakila.Staff;
 import com.sakila.sakila_project.infrastructure.adapters.output.repositories.sakila.StaffRepository;
@@ -38,8 +39,11 @@ public class StaffController {
     }
 
     @GetMapping("/getByCredentials")
-    public ResponseEntity getByCredentials(@RequestParam String username, @RequestParam String password){
+    public ResponseEntity getByCredentials(@RequestBody Credentials credentials){
         try{
+
+            var username = credentials.getUsername();
+            var password = credentials.getPassword();
 
             if(username.isEmpty() || password.isEmpty()){
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username or password is empty");
