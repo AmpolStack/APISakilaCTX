@@ -22,7 +22,7 @@ public class Staff {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id")
     private Address address;
-    private String picture;
+    private byte[] picture;
     @Column(length = 50)
     private String email;
     @ManyToOne(fetch = FetchType.LAZY)
