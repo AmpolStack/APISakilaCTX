@@ -16,6 +16,9 @@ public class Store {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "store_id")
     private int id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "address_id")
+    private Address address;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "store")
     private Set<Inventory> inventory;
     private Date last_update;
