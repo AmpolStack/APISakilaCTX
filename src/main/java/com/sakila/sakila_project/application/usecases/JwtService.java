@@ -9,9 +9,7 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
-import java.util.Date;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class JwtService {
@@ -47,6 +45,39 @@ public class JwtService {
         return UUID.randomUUID().toString();
     }
 
+    public boolean isTokenValid(String token) {
+        var claims = getClaimsFromToken(token);
+        return claims.getExpiration().after(new Date());
+    }
+
+    public List<Object> getClaimsList(String token, Map<String, Class<?>> map){
+        var claims = getClaimsFromToken(token);
+        var resultList = new ArrayList<>();
+
+        map.forEach((k, v) ->{
+            var valueClaim = claims.get(k);
+            if(v.isInstance(valueClaim)){
+                resultList.add(v);
+            }
+            else{
+                throw new ClassCastException("Invalid claim");
+                //resultList.add(null);
+            }
+        });
+        return resultList;
+    }
+
+    public <T> T getClaim(String token, String claimName, Class<T> claimType){
+        var claims = getClaimsFromToken(token);
+        var claimValue = claims.get(claimName);
+        if(claimType.isInstance(claimType)){
+            return claimType.cast(claimValue);
+        }
+        else{
+            throw new ClassCastException("Invalid claim");
+            //return null;
+        }
+    }
 
     private Claims getClaimsFromToken(String token) {
         return Jwts
@@ -56,8 +87,5 @@ public class JwtService {
                 .parseSignedClaims(token)
                 .getPayload();
     }
-
-
-
 
 }
