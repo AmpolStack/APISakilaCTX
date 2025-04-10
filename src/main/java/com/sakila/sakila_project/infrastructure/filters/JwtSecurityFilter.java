@@ -52,8 +52,13 @@ public class JwtSecurityFilter extends OncePerRequestFilter {
 
         String tokenHeader = request.getHeader("Authorization");
 
+        if(tokenHeader.isEmpty()){
+            log.error("Authorization header is empty");
+            return;
+        }
+
         if(!tokenHeader.startsWith("Bearer ")){
-            log.error("the header is empty or invalid");
+            log.error("the header is invalid");
             return;
         }
 

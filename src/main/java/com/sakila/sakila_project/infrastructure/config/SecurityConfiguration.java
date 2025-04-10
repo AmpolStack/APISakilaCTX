@@ -54,6 +54,7 @@ public class SecurityConfiguration {
                 .securityMatcher("/**")
                 .authorizeHttpRequests(request ->
                         request.anyRequest().permitAll())
+                .httpBasic(conf -> conf.disable())
                 .build();
     }
 
