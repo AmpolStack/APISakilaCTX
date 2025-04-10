@@ -1,9 +1,12 @@
 package com.sakila.sakila_project.infrastructure.adapters.input.rest;
 
+import com.sakila.sakila_project.application.custom.AuthUser;
+import com.sakila.sakila_project.application.custom.AuthenticationRequest;
 import com.sakila.sakila_project.application.custom.Credentials;
 import com.sakila.sakila_project.application.maps.MinimalDtoMapper;
 import com.sakila.sakila_project.application.maps.MinimalDtoMapperImpl;
 import com.sakila.sakila_project.application.maps.StaffDtoMapper;
+import com.sakila.sakila_project.application.usecases.JwtService;
 import com.sakila.sakila_project.domain.model.sakila.Staff;
 import com.sakila.sakila_project.infrastructure.adapters.output.repositories.sakila.StaffRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +14,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,14 +26,16 @@ public class StaffController {
     private StaffRepository repository;
     private MinimalDtoMapper minimalDtoMapper;
     private StaffDtoMapper staffDtoMapper;
+    private JwtService jwtService;
 
 
     @Autowired
     public StaffController(StaffRepository repository, MinimalDtoMapper minimalDtoMapper,
-                           StaffDtoMapper staffDtoMapper) {
+                           StaffDtoMapper staffDtoMapper, JwtService jwtService) {
         this.repository = repository;
         this.minimalDtoMapper = minimalDtoMapper;
         this.staffDtoMapper = staffDtoMapper;
+        this.jwtService = jwtService;
     }
 
 
@@ -45,36 +51,20 @@ public class StaffController {
         }
     }
 
-    @GetMapping("/getByCredentials")
-    public ResponseEntity getByCredentials(@RequestBody Credentials credentials){
+
+    @GetMapping("/getAllInfoById")
+    public ResponseEntity getAllInfoByCredentials(){
         try{
 
-            var username = credentials.getUsername();
-            var password = credentials.getPassword();
+            var auth = SecurityContextHolder.getContext().getAuthentication();
 
-            if(username.isEmpty() || password.isEmpty()){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username or password is empty");
+            if(!(auth.getPrincipal() instanceof AuthUser)){
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This user not have permission to access this resource");
             }
 
-            var staffOp = this.repository.findStaffByUsernameAndPassword(username, password);
+            var id = ((AuthUser) auth.getPrincipal()).getId();
+            var staffOp = this.repository.findById(id);
 
-            if(staffOp.isEmpty()){
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Staff not found");
-            }
-
-            var staff = staffOp.get();
-            var map = this.minimalDtoMapper.toMinStaffDto(staff);
-            return ResponseEntity.status(HttpStatus.OK).body(map);
-        }
-        catch(Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-    }
-
-    @GetMapping("/getAllInfoByCredentials")
-    public ResponseEntity getAllInfoByCredentials(@RequestParam String username, @RequestParam String password){
-        try{
-            var staffOp = this.repository.findStaffByUsernameAndPassword(username, password);
             if(staffOp.isEmpty()){
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Staff not found");
             }
@@ -86,6 +76,35 @@ public class StaffController {
         }
         catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/open/obtainAuthentication")
+    public ResponseEntity obtainAuthentication(@RequestBody Credentials credentials){
+        try{
+            var auth = this.jwtService.AuthenticateByCredentials(credentials);
+            if(!auth.isSuccess()){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(auth.getMessage());
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(auth);
+        }
+        catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
+    }
+
+    @PostMapping("/open/refreshAuthentication")
+    public ResponseEntity refreshAuthentication(@RequestBody AuthenticationRequest authenticationRequest){
+        try{
+            var auth = this.jwtService.AuthenticateByRefreshToken(authenticationRequest);
+            if(!auth.isSuccess()){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(auth.getMessage());
+            }
+
+            return ResponseEntity.status(HttpStatus.OK).body(auth);
+        }
+        catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
     }
 
