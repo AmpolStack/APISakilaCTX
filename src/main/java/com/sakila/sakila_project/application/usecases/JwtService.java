@@ -173,6 +173,7 @@ public class JwtService {
         return resultList;
     }
 
+
     public <T> T getClaim(String token, String claimName, Class<T> claimType){
         var claims = getClaimsFromToken(token);
         var claimValue = claims.get(claimName);
@@ -183,6 +184,11 @@ public class JwtService {
             throw new ClassCastException("Invalid claim");
             //return null;
         }
+    }
+
+    public Claims getAllClaims(String token){
+        var claims = getClaimsFromToken(token);
+        return claims;
     }
 
     private Claims getClaimsFromToken(String token) {
