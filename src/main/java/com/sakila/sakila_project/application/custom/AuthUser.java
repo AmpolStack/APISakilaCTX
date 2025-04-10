@@ -11,6 +11,9 @@ import java.util.List;
 
 public class AuthUser implements UserDetails {
 
+    @Getter
+    @Setter
+    private int id;
     @Setter
     private String username;
     @Setter

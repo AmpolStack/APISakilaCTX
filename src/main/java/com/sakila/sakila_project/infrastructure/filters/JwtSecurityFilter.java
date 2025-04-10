@@ -88,6 +88,7 @@ public class JwtSecurityFilter extends OncePerRequestFilter {
         log.info("CREATE AUTHENTICATION INSTANCE FOR : {}", name);
 
         var user = new AuthUser();
+        user.setId(Integer.parseInt(id));
         user.setUsername(name);
         user.setPassword(id);
         user.setEmail(email);
