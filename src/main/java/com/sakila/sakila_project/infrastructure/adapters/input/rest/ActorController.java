@@ -58,7 +58,7 @@ public class ActorController {
         }
     }
 
-    @DeleteMapping("/deleteActorById")
+    @DeleteMapping("/auth/deleteActorById")
     public ResponseEntity deleteActorById(@RequestParam int id) {
         try{
             if(!this.actorRepository.existsById(id)){
@@ -95,7 +95,7 @@ public class ActorController {
         }
     }
 
-    @PutMapping("/updateActor")
+    @PutMapping("/auth/updateActor")
     public ResponseEntity updateActor(@RequestBody MinActorDto actor,
                                       @RequestParam int id) {
         try{
@@ -114,12 +114,7 @@ public class ActorController {
         }
     }
 
-    //spring security implements csrf solicitation for http patch requests
-    //and the csrf token is inaccessible for default
-    //the csrf cookie is sending in any Get endpoint for configuration
-    //but is inefficient
-    //switch to 'Patch' whenever possible
-    @GetMapping("/addFilmWithActorById")
+    @PatchMapping("/addFilmWithActorById")
     public ResponseEntity addFilm(@RequestParam int actorId, @RequestParam int filmId){
         try{
            var actorOpt = this.actorRepository.findById(actorId);
@@ -145,3 +140,4 @@ public class ActorController {
     }
 
 }
+s
