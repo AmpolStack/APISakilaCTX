@@ -1,6 +1,5 @@
 package com.sakila.sakila_project.domain.model.sakila;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

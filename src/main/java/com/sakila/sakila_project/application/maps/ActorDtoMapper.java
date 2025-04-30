@@ -14,9 +14,9 @@ import org.mapstruct.Named;
 public interface ActorDtoMapper {
 
     @Mapping(target = "language", qualifiedByName = "LanguageObjectToString")
-    public ExtFilmDto toFilmWithLanguageDto(Film film);
+    ExtFilmDto toFilmWithLanguageDto(Film film);
 
-    public ExtActorDto toActorWithFilmDto(Actor dto);
+    ExtActorDto toActorWithFilmDto(Actor dto);
 
     @Named("LanguageObjectToString")
     default String toLanguageObjectToString(Language language) {

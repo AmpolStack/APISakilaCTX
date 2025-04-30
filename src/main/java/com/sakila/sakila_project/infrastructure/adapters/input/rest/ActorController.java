@@ -1,9 +1,7 @@
 package com.sakila.sakila_project.infrastructure.adapters.input.rest;
 
-import com.sakila.sakila_project.application.dto.ExtFilmDto;
 import com.sakila.sakila_project.application.dto.MinActorDto;
 import com.sakila.sakila_project.application.maps.ActorDtoMapper;
-import com.sakila.sakila_project.application.maps.FilmDtoMapper;
 import com.sakila.sakila_project.application.maps.MinimalDtoMapper;
 import com.sakila.sakila_project.infrastructure.adapters.output.repositories.sakila.ActorRepository;
 import com.sakila.sakila_project.infrastructure.adapters.output.repositories.sakila.FilmRepository;
@@ -15,10 +13,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/actors")
 public class ActorController {
-    private ActorRepository actorRepository;
-    private FilmRepository filmRepository;
-    private MinimalDtoMapper minimalDtoMapper;
-    private ActorDtoMapper actorDtoMapper;
+    private final ActorRepository actorRepository;
+    private final FilmRepository filmRepository;
+    private final MinimalDtoMapper minimalDtoMapper;
+    private final ActorDtoMapper actorDtoMapper;
 
     @Autowired
     public ActorController(ActorRepository actorRepository, MinimalDtoMapper minimalDtoMapper, ActorDtoMapper actorDtoMapper,

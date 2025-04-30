@@ -1,14 +1,9 @@
 package com.sakila.sakila_project.application.dto;
 
-import com.sakila.sakila_project.domain.model.sakila.Address;
-import com.sakila.sakila_project.domain.model.sakila.Payment;
-import com.sakila.sakila_project.domain.model.sakila.Store;
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
-import java.util.List;
 
 @Getter
 @Setter

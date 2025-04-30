@@ -1,7 +1,6 @@
 package com.sakila.sakila_project.application.maps;
 
 import com.sakila.sakila_project.application.dto.ExtStaffDto;
-import com.sakila.sakila_project.application.dto.ExtStoreDto;
 import com.sakila.sakila_project.domain.model.sakila.Staff;
 import org.mapstruct.Mapper;
 

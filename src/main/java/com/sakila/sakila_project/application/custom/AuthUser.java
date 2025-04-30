@@ -9,19 +9,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
+@Setter
 public class AuthUser implements UserDetails {
 
     @Getter
-    @Setter
     private int id;
-    @Setter
     private String username;
-    @Setter
     private String password;
-    @Setter
     @Getter
     private String phone;
-    @Setter
     @Getter
     private String email;
 
