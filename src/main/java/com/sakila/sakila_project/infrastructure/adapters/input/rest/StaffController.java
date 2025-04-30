@@ -9,6 +9,7 @@ import com.sakila.sakila_project.application.usecases.JwtService;
 import com.sakila.sakila_project.domain.model.sakila.Staff;
 import com.sakila.sakila_project.infrastructure.adapters.output.repositories.sakila.StaffRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,6 +21,11 @@ import java.util.List;
 @RequestMapping("/staff")
 public class StaffController {
 
+    @Value("${spring.security.jwt.token.expirationMs}")
+    private int tokenExpiration;
+
+    @Value("${spring.security.jwt.refresh.token.expirationMs}")
+    private int refreshTokenExpiration;
     private final StaffRepository repository;
     private final MinimalDtoMapper minimalDtoMapper;
     private final StaffDtoMapper staffDtoMapper;
@@ -27,8 +33,10 @@ public class StaffController {
 
 
     @Autowired
-    public StaffController(StaffRepository repository, MinimalDtoMapper minimalDtoMapper,
-                           StaffDtoMapper staffDtoMapper, JwtService jwtService) {
+    public StaffController(StaffRepository repository,
+                           MinimalDtoMapper minimalDtoMapper,
+                           StaffDtoMapper staffDtoMapper,
+                           JwtService jwtService) {
         this.repository = repository;
         this.minimalDtoMapper = minimalDtoMapper;
         this.staffDtoMapper = staffDtoMapper;
@@ -79,7 +87,7 @@ public class StaffController {
     @PostMapping("/open/obtainAuthentication")
     public ResponseEntity obtainAuthentication(@RequestBody Credentials credentials){
         try{
-            var auth = this.jwtService.AuthenticateByCredentials(credentials);
+            var auth = this.jwtService.AuthenticateByCredentials(credentials, refreshTokenExpiration, tokenExpiration);
             if(!auth.isSuccess()){
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(auth.getMessage());
             }
@@ -93,7 +101,7 @@ public class StaffController {
     @PostMapping("/open/refreshAuthentication")
     public ResponseEntity refreshAuthentication(@RequestBody AuthenticationRequest authenticationRequest){
         try{
-            var auth = this.jwtService.AuthenticateByRefreshToken(authenticationRequest);
+            var auth = this.jwtService.AuthenticateByRefreshToken(authenticationRequest, tokenExpiration, refreshTokenExpiration);
             if(!auth.isSuccess()){
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(auth.getMessage());
             }

@@ -44,7 +44,7 @@ public class ActorController {
         try{
             var actor = this.actorRepository.findById(id);
 
-            if(actor == null){
+            if(actor.isEmpty()){
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Actor not found");
             }
 
@@ -59,6 +59,7 @@ public class ActorController {
     @DeleteMapping("/auth/deleteActorById")
     public ResponseEntity deleteActorById(@RequestParam int id) {
         try{
+
             if(!this.actorRepository.existsById(id)){
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Actor not found");
             }
@@ -112,11 +113,11 @@ public class ActorController {
     public ResponseEntity addFilm(@RequestParam int actorId, @RequestParam int filmId){
         try{
            var actorOpt = this.actorRepository.findById(actorId);
-           if(actorOpt == null){
+           if(actorOpt.isEmpty()){
                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Actor not found");
            }
            var filmOpt = this.filmRepository.findById(filmId);
-           if(filmOpt == null){
+           if(filmOpt.isEmpty()){
                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Film not found");
            }
            var actor = actorOpt.get();

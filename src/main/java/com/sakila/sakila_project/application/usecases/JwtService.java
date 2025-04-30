@@ -9,7 +9,6 @@ import com.sakila.sakila_project.infrastructure.adapters.output.repositories.sak
 import com.sakila.sakila_project.infrastructure.adapters.output.repositories.tokens.TokenRegistrationRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,17 +20,11 @@ import java.util.*;
 @Service
 public class JwtService {
 
-    @Value("${spring.security.jwt.token.expirationMs}")
-    private int tokenExpiration;
-
-    @Value("${spring.security.jwt.refresh.token.expirationMs}")
-    private int refreshTokenExpiration;
-
     @Value("${spring.security.jwt.secret}")
     private String secret;
 
-    private TokenRegistrationRepository tokenRepository;
-    private StaffRepository staffRepository;
+    private final TokenRegistrationRepository tokenRepository;
+    private final StaffRepository staffRepository;
 
     @Autowired
     public JwtService(TokenRegistrationRepository tokenRepository, StaffRepository staffRepository) {
@@ -44,7 +37,7 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public AuthenticationResponse AuthenticateByRefreshToken(AuthenticationRequest authenticationRequest) {
+    public AuthenticationResponse AuthenticateByRefreshToken(AuthenticationRequest authenticationRequest, int refreshTokenExpiration, int tokenExpiration) {
         var authResponse = new AuthenticationResponse();
         var tokenRegistryOp = this.tokenRepository.findTokenRegistrationByTokenAndRefreshToken(
                 authenticationRequest.getToken(),
@@ -70,12 +63,12 @@ public class JwtService {
             authResponse.setSuccess(false);
         }
 
-        SaveRegistration(staffOp.get(), authResponse);
+        SaveRegistration(staffOp.get(), authResponse, refreshTokenExpiration, tokenExpiration);
         return authResponse;
 
     }
 
-    public AuthenticationResponse AuthenticateByCredentials(Credentials credentials) {
+    public AuthenticationResponse AuthenticateByCredentials(Credentials credentials, int refreshTokenExpiration, int tokenExpiration) {
         var authResponse = new AuthenticationResponse();
 
         if(credentials.getUsername().isEmpty() || credentials.getPassword().isEmpty()) {
@@ -94,15 +87,15 @@ public class JwtService {
 
         var staff = staffOp.get();
 
-        SaveRegistration(staff, authResponse);
+        SaveRegistration(staff, authResponse, refreshTokenExpiration, tokenExpiration);
 
         return authResponse;
     }
 
-    private void SaveRegistration(Staff staff, AuthenticationResponse authResponse) {
+    private void SaveRegistration(Staff staff, AuthenticationResponse authResponse, int refreshTokenExpiration, int tokenExpiration) {
 
         var claimMap = generateClaimsMap(staff);
-        var token = generateToken(claimMap, staff.getUsername());
+        var token = generateToken(claimMap, staff.getUsername(), tokenExpiration);
         var refreshToken = generateRefreshToken();
 
         var tokenRegistry = new TokenRegistration();
@@ -121,7 +114,6 @@ public class JwtService {
             authResponse.setRefreshToken(refreshToken);
         }
         catch(Exception e){
-            e.printStackTrace();
             authResponse.setSuccess(false);
             authResponse.setMessage("Error saving token, please try again later");
         }
@@ -136,13 +128,13 @@ public class JwtService {
         return map;
     }
 
-    private String generateToken(Map<String, String> claims, String subject) {
+    private String generateToken(Map<String, String> claims, String subject, int expiration) {
         return Jwts.builder()
                 .subject(subject)
                 .claims(claims)
                 .issuedAt(new Date())
-                .expiration(new Date(new Date().getTime() + this.tokenExpiration))
-                .signWith(getSecretKey(), SignatureAlgorithm.HS256)
+                .expiration(new Date(new Date().getTime() + expiration))
+                .signWith(getSecretKey())
                 .compact();
     }
 
@@ -167,7 +159,6 @@ public class JwtService {
             }
             else{
                 throw new ClassCastException("Invalid claim");
-                //resultList.add(null);
             }
         });
         return resultList;
@@ -182,13 +173,11 @@ public class JwtService {
         }
         else{
             throw new ClassCastException("Invalid claim");
-            //return null;
         }
     }
 
     public Claims getAllClaims(String token){
-        var claims = getClaimsFromToken(token);
-        return claims;
+        return getClaimsFromToken(token);
     }
 
     private Claims getClaimsFromToken(String token) {
