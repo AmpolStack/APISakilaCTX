@@ -31,9 +31,7 @@ public class SecurityConfiguration {
     @Order(1)
     public SecurityFilterChain JwtAuthSecurityFilterChain(HttpSecurity http) throws Exception {
         return http
-                //TODO: Implement most specific configuration for CSRF AND CORS
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(AbstractHttpConfigurer::disable)
                 .securityMatcher(new OrRequestMatcher(
                         new AntPathRequestMatcher("/staff/**"),
                         new AntPathRequestMatcher("/**/auth/**")
