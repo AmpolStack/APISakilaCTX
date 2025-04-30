@@ -14,6 +14,8 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -32,7 +34,10 @@ public class SecurityConfiguration {
                 //TODO: Implement most specific configuration for CSRF AND CORS
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
-                .securityMatcher("/staff/**")
+                .securityMatcher(new OrRequestMatcher(
+                        new AntPathRequestMatcher("/staff/**"),
+                        new AntPathRequestMatcher("/**/auth/**")
+                ))
                 .authorizeHttpRequests(request ->{
                     request.requestMatchers("/staff/open/**").permitAll();
                     request.anyRequest().authenticated();

@@ -74,15 +74,10 @@ public class ActorController {
     }
 
 
-    @PostMapping("/createActor")
-    public ResponseEntity createActor(@RequestBody MinActorDto actor,
-                                      @RequestParam int id) {
+    @PostMapping("/auth/createActor")
+    public ResponseEntity createActor(@RequestBody MinActorDto actor) {
         try{
 
-            if(this.actorRepository.existsById(id)){
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("Actor already exists");
-            }
-            
             var map = this.minimalDtoMapper.toActor(actor);
             var resp = this.actorRepository.saveAndFlush(map);
 
@@ -102,6 +97,7 @@ public class ActorController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Actor not found");
             }
             var map = this.minimalDtoMapper.toActor(actor);
+            map.setId(id);
             var resp = this.actorRepository.saveAndFlush(map);
 
             return ResponseEntity.ok(resp);
@@ -112,7 +108,7 @@ public class ActorController {
         }
     }
 
-    @PatchMapping("/addFilmWithActorById")
+    @PatchMapping("/auth/addFilmWithActorById")
     public ResponseEntity addFilm(@RequestParam int actorId, @RequestParam int filmId){
         try{
            var actorOpt = this.actorRepository.findById(actorId);
