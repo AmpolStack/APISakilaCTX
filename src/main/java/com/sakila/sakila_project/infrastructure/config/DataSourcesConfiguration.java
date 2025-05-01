@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Primary;
 import javax.sql.DataSource;
 
 @Configuration
-public class DataSourcesConfig {
+public class DataSourcesConfiguration {
 
     // Sakila Db datasource - in mariaDb
     @Primary
