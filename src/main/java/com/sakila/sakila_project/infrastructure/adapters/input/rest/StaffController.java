@@ -5,6 +5,7 @@ import com.sakila.sakila_project.application.custom.AuthenticationRequest;
 import com.sakila.sakila_project.application.custom.Credentials;
 import com.sakila.sakila_project.application.maps.MinimalDtoMapper;
 import com.sakila.sakila_project.application.maps.StaffDtoMapper;
+import com.sakila.sakila_project.domain.adapters.input.IEmailService;
 import com.sakila.sakila_project.domain.adapters.input.IJwtService;
 import com.sakila.sakila_project.domain.model.sakila.Staff;
 import com.sakila.sakila_project.infrastructure.adapters.output.repositories.sakila.StaffRepository;
@@ -31,17 +32,20 @@ public class StaffController {
     private final MinimalDtoMapper minimalDtoMapper;
     private final StaffDtoMapper staffDtoMapper;
     private final IJwtService jwtService;
+    private final IEmailService emailService;
 
 
     @Autowired
     public StaffController(StaffRepository repository,
                            MinimalDtoMapper minimalDtoMapper,
                            StaffDtoMapper staffDtoMapper,
-                           IJwtService jwtService) {
+                           IJwtService jwtService,
+                           IEmailService emailService) {
         this.repository = repository;
         this.minimalDtoMapper = minimalDtoMapper;
         this.staffDtoMapper = staffDtoMapper;
         this.jwtService = jwtService;
+        this.emailService = emailService;
     }
 
 
@@ -117,6 +121,16 @@ public class StaffController {
     @GetMapping("/open/getCsrfToken")
     public ResponseEntity getCsrfToken(CsrfToken csrfToken){
         return ResponseEntity.status(HttpStatus.OK).body(csrfToken);
+    }
+
+    @GetMapping("/open/SendMail")
+    public ResponseEntity getSendMail(){
+        var subject = "Hello Test Subject";
+        var body = "Hello Test Body Lorem Ipsum";
+        var receiverMail = "sacount571@gmail.com";
+        var senderMail = "htrsanbl@gmail.com";
+        var resp = this.emailService.SendEmail(subject, body, senderMail, receiverMail);
+        return ResponseEntity.status(HttpStatus.OK).body(resp);
     }
 
 }
