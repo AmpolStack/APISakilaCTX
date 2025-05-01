@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -111,6 +112,11 @@ public class StaffController {
         catch (Exception ex){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
+    }
+
+    @GetMapping("/open/getCsrfToken")
+    public ResponseEntity getCsrfToken(CsrfToken csrfToken){
+        return ResponseEntity.status(HttpStatus.OK).body(csrfToken);
     }
 
 }

@@ -15,6 +15,8 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
@@ -38,7 +40,10 @@ public class SecurityConfiguration {
     public SecurityFilterChain JwtAuthSecurityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .cors(Customizer.withDefaults())
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(x ->
+                        x.csrfTokenRepository(new HttpSessionCsrfTokenRepository())
+                                .ignoringRequestMatchers("/staff/open/**")
+                )
                 .securityMatcher(new OrRequestMatcher(
                         new AntPathRequestMatcher("/staff/**"),
                         new AntPathRequestMatcher("/**/auth/**")
@@ -62,7 +67,7 @@ public class SecurityConfiguration {
     public SecurityFilterChain GeneralUnauthorizedFilterChain(HttpSecurity http) throws Exception {
         return http
                 .cors(Customizer.withDefaults())
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(x -> x.csrfTokenRepository(new HttpSessionCsrfTokenRepository()))
                 .securityMatcher("/**")
                 .authorizeHttpRequests(request ->
                         request.anyRequest().permitAll())
@@ -100,5 +105,6 @@ public class SecurityConfiguration {
         return (request, response, accessDeniedException) ->
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
     }
+
 
 }
