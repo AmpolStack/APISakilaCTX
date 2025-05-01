@@ -1,4 +1,4 @@
-package com.sakila.sakila_project.infrastructure.config;
+package com.sakila.sakila_project.infrastructure.config.Jpa;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
