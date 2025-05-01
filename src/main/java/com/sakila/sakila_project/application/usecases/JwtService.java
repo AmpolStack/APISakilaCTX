@@ -3,6 +3,7 @@ package com.sakila.sakila_project.application.usecases;
 import com.sakila.sakila_project.application.custom.AuthenticationRequest;
 import com.sakila.sakila_project.application.custom.AuthenticationResponse;
 import com.sakila.sakila_project.application.custom.Credentials;
+import com.sakila.sakila_project.domain.adapters.input.IJwtService;
 import com.sakila.sakila_project.domain.model.sakila.Staff;
 import com.sakila.sakila_project.domain.model.tokens.TokenRegistration;
 import com.sakila.sakila_project.infrastructure.adapters.output.repositories.sakila.StaffRepository;
@@ -18,7 +19,7 @@ import javax.crypto.SecretKey;
 import java.util.*;
 
 @Service
-public class JwtService {
+public class JwtService implements IJwtService {
 
     @Value("${spring.security.jwt.secret}")
     private String secret;

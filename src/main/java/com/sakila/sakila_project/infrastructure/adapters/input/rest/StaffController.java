@@ -5,7 +5,7 @@ import com.sakila.sakila_project.application.custom.AuthenticationRequest;
 import com.sakila.sakila_project.application.custom.Credentials;
 import com.sakila.sakila_project.application.maps.MinimalDtoMapper;
 import com.sakila.sakila_project.application.maps.StaffDtoMapper;
-import com.sakila.sakila_project.application.usecases.JwtService;
+import com.sakila.sakila_project.domain.adapters.input.IJwtService;
 import com.sakila.sakila_project.domain.model.sakila.Staff;
 import com.sakila.sakila_project.infrastructure.adapters.output.repositories.sakila.StaffRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,14 +30,14 @@ public class StaffController {
     private final StaffRepository repository;
     private final MinimalDtoMapper minimalDtoMapper;
     private final StaffDtoMapper staffDtoMapper;
-    private final JwtService jwtService;
+    private final IJwtService jwtService;
 
 
     @Autowired
     public StaffController(StaffRepository repository,
                            MinimalDtoMapper minimalDtoMapper,
                            StaffDtoMapper staffDtoMapper,
-                           JwtService jwtService) {
+                           IJwtService jwtService) {
         this.repository = repository;
         this.minimalDtoMapper = minimalDtoMapper;
         this.staffDtoMapper = staffDtoMapper;

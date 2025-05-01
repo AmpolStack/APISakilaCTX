@@ -1,7 +1,7 @@
 package com.sakila.sakila_project.infrastructure.filters;
 
 import com.sakila.sakila_project.application.custom.AuthUser;
-import com.sakila.sakila_project.application.usecases.JwtService;
+import com.sakila.sakila_project.domain.adapters.input.IJwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,11 +22,11 @@ import java.io.IOException;
 @Slf4j
 public class JwtSecurityFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
+    private final IJwtService jwtService;
     private final HandlerExceptionResolver handlerExceptionResolver;
 
     @Autowired
-    public JwtSecurityFilter(JwtService jwtService, HandlerExceptionResolver handlerExceptionResolver) {
+    public JwtSecurityFilter(IJwtService jwtService, HandlerExceptionResolver handlerExceptionResolver) {
         this.jwtService = jwtService;
         this.handlerExceptionResolver = handlerExceptionResolver;
     }
