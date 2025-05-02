@@ -123,14 +123,4 @@ public class StaffController {
         return ResponseEntity.status(HttpStatus.OK).body(csrfToken);
     }
 
-    @GetMapping("/open/SendMail")
-    public ResponseEntity getSendMail(){
-        var subject = "Hello Test Subject";
-        var body = "Hello Test Body Lorem Ipsum";
-        var receiverMail = "sacount571@gmail.com";
-        var senderMail = "htrsanbl@gmail.com";
-        var resp = this.emailService.SendEmail(subject, body, senderMail, receiverMail);
-        return ResponseEntity.status(HttpStatus.OK).body(resp);
-    }
-
 }
