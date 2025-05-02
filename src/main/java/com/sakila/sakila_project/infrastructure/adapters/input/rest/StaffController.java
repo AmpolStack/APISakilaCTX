@@ -5,7 +5,6 @@ import com.sakila.sakila_project.application.custom.AuthenticationRequest;
 import com.sakila.sakila_project.application.custom.Credentials;
 import com.sakila.sakila_project.application.maps.MinimalDtoMapper;
 import com.sakila.sakila_project.application.maps.StaffDtoMapper;
-import com.sakila.sakila_project.domain.adapters.input.IEmailService;
 import com.sakila.sakila_project.domain.adapters.input.IJwtService;
 import com.sakila.sakila_project.domain.model.sakila.Staff;
 import com.sakila.sakila_project.infrastructure.adapters.output.repositories.sakila.StaffRepository;
@@ -32,25 +31,22 @@ public class StaffController {
     private final MinimalDtoMapper minimalDtoMapper;
     private final StaffDtoMapper staffDtoMapper;
     private final IJwtService jwtService;
-    private final IEmailService emailService;
 
 
     @Autowired
     public StaffController(StaffRepository repository,
                            MinimalDtoMapper minimalDtoMapper,
                            StaffDtoMapper staffDtoMapper,
-                           IJwtService jwtService,
-                           IEmailService emailService) {
+                           IJwtService jwtService) {
         this.repository = repository;
         this.minimalDtoMapper = minimalDtoMapper;
         this.staffDtoMapper = staffDtoMapper;
         this.jwtService = jwtService;
-        this.emailService = emailService;
     }
 
 
     @GetMapping("/getAllStaffs")
-    public ResponseEntity getAllStaffs(){
+    public ResponseEntity<?> getAllStaffs(){
         try{
             List<Staff> staffs = repository.findAll();
             var maps = this.minimalDtoMapper.toMinStaffDtoList(staffs);
@@ -63,7 +59,7 @@ public class StaffController {
 
 
     @GetMapping("/getAllInfoById")
-    public ResponseEntity getAllInfoByCredentials(){
+    public ResponseEntity<?> getAllInfoByCredentials(){
         try{
 
             var auth = SecurityContextHolder.getContext().getAuthentication();
@@ -90,7 +86,7 @@ public class StaffController {
     }
 
     @PostMapping("/open/obtainAuthentication")
-    public ResponseEntity obtainAuthentication(@RequestBody Credentials credentials){
+    public ResponseEntity<?> obtainAuthentication(@RequestBody Credentials credentials){
         try{
             var auth = this.jwtService.AuthenticateByCredentials(credentials, refreshTokenExpiration, tokenExpiration);
             if(!auth.isSuccess()){
@@ -104,7 +100,7 @@ public class StaffController {
     }
 
     @PostMapping("/open/refreshAuthentication")
-    public ResponseEntity refreshAuthentication(@RequestBody AuthenticationRequest authenticationRequest){
+    public ResponseEntity<?> refreshAuthentication(@RequestBody AuthenticationRequest authenticationRequest){
         try{
             var auth = this.jwtService.AuthenticateByRefreshToken(authenticationRequest, tokenExpiration, refreshTokenExpiration);
             if(!auth.isSuccess()){
@@ -119,8 +115,7 @@ public class StaffController {
     }
 
     @GetMapping("/open/getCsrfToken")
-    public ResponseEntity getCsrfToken(CsrfToken csrfToken){
+    public ResponseEntity<?> getCsrfToken(CsrfToken csrfToken){
         return ResponseEntity.status(HttpStatus.OK).body(csrfToken);
     }
-
 }
