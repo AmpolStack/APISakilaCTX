@@ -21,24 +21,17 @@ public class EmailService implements IEmailService {
     }
 
     @Override
-    public boolean SendEmail(String subject, String body, String senderMail, String recipientMail) {
+    public void SendEmail(String subject, String body, String senderMail, String recipientMail) {
         var message = new SimpleMailMessage();
         message.setFrom(senderMail);
         message.setTo(recipientMail);
         message.setSubject(subject);
         message.setText(body);
-        try{
-            _emailSender.send(message);
-            return true;
-        }
-        catch(Exception e){
-            log.error(e.getMessage());
-            return false;
-        }
+        _emailSender.send(message);
     }
 
     @Override
-    public boolean SendEmail(String subject, String body, String senderMail, String recipientMail, InputStream file) {
-        return false;
+    public void SendEmail(String subject, String body, String senderMail, String recipientMail, InputStream file) {
+
     }
 }
