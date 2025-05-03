@@ -1,4 +1,4 @@
-package com.sakila.sakila_project.infrastructure.dto;
+package com.sakila.sakila_project.application.dto;
 
 import lombok.Getter;
 import lombok.Setter;

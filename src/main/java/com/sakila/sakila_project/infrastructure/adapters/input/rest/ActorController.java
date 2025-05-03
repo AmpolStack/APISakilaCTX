@@ -1,11 +1,11 @@
-package com.sakila.sakila_project.application.adapters.input.rest;
+package com.sakila.sakila_project.infrastructure.adapters.input.rest;
 
-import com.sakila.sakila_project.infrastructure.dto.MinActorDto;
-import com.sakila.sakila_project.infrastructure.maps.ActorDtoMapper;
-import com.sakila.sakila_project.infrastructure.maps.MinimalDtoMapper;
-import com.sakila.sakila_project.domain.adapters.input.IEmailService;
-import com.sakila.sakila_project.application.adapters.output.repositories.sakila.ActorRepository;
-import com.sakila.sakila_project.application.adapters.output.repositories.sakila.FilmRepository;
+import com.sakila.sakila_project.application.dto.MinActorDto;
+import com.sakila.sakila_project.application.maps.ActorDtoMapper;
+import com.sakila.sakila_project.application.maps.MinimalDtoMapper;
+import com.sakila.sakila_project.domain.ports.output.IEmailService;
+import com.sakila.sakila_project.domain.ports.output.repositories.sakila.ActorRepository;
+import com.sakila.sakila_project.domain.ports.output.repositories.sakila.FilmRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;

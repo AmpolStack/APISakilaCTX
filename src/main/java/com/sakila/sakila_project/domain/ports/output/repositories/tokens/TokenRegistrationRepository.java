@@ -1,4 +1,4 @@
-package com.sakila.sakila_project.infrastructure.adapters.output.repositories.tokens;
+package com.sakila.sakila_project.domain.ports.output.repositories.tokens;
 
 import com.sakila.sakila_project.domain.model.tokens.TokenRegistration;
 import org.springframework.data.jpa.repository.JpaRepository;

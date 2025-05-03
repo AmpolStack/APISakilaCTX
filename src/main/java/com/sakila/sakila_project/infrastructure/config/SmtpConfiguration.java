@@ -1,6 +1,6 @@
-package com.sakila.sakila_project.application.config;
+package com.sakila.sakila_project.infrastructure.config;
 
-import com.sakila.sakila_project.infrastructure.custom.SmtpOptions;
+import com.sakila.sakila_project.application.custom.SmtpOptions;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

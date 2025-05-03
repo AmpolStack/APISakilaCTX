@@ -1,7 +1,7 @@
-package com.sakila.sakila_project.application.filters;
+package com.sakila.sakila_project.infrastructure.filters;
 
-import com.sakila.sakila_project.infrastructure.custom.AuthUser;
-import com.sakila.sakila_project.domain.adapters.input.IJwtService;
+import com.sakila.sakila_project.application.custom.AuthUser;
+import com.sakila.sakila_project.domain.ports.input.IJwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

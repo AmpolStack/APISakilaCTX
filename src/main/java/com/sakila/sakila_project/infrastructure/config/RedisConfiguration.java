@@ -1,4 +1,4 @@
-package com.sakila.sakila_project.application.config;
+package com.sakila.sakila_project.infrastructure.config;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;

@@ -1,6 +1,6 @@
-package com.sakila.sakila_project.application.config;
+package com.sakila.sakila_project.infrastructure.config;
 
-import com.sakila.sakila_project.application.filters.JwtSecurityFilter;
+import com.sakila.sakila_project.infrastructure.filters.JwtSecurityFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

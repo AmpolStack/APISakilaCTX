@@ -1,6 +1,6 @@
-package com.sakila.sakila_project.infrastructure.usecases;
+package com.sakila.sakila_project.infrastructure.adapters.output;
 
-import com.sakila.sakila_project.domain.adapters.input.IEmailService;
+import com.sakila.sakila_project.domain.ports.output.IEmailService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;

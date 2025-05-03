@@ -1,4 +1,4 @@
-package com.sakila.sakila_project.application.config.Jpa;
+package com.sakila.sakila_project.infrastructure.config.Jpa;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +18,7 @@ import java.util.Objects;
 
 @Configuration
 @EnableJpaRepositories(
-        basePackages = "com.sakila.sakila_project.application.adapters.output.repositories.sakila",
+        basePackages = "com.sakila.sakila_project.infrastructure.adapters.output.repositories.sakila",
         entityManagerFactoryRef = "SakilaEMF",
         transactionManagerRef = "SakilaTM"
 )

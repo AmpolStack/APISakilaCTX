@@ -1,7 +1,7 @@
-package com.sakila.sakila_project.infrastructure.maps;
+package com.sakila.sakila_project.application.maps;
 
-import com.sakila.sakila_project.infrastructure.dto.ExtActorDto;
-import com.sakila.sakila_project.infrastructure.dto.ExtFilmDto;
+import com.sakila.sakila_project.application.dto.ExtActorDto;
+import com.sakila.sakila_project.application.dto.ExtFilmDto;
 import com.sakila.sakila_project.domain.model.sakila.Actor;
 import com.sakila.sakila_project.domain.model.sakila.Film;
 import com.sakila.sakila_project.domain.model.sakila.Language;

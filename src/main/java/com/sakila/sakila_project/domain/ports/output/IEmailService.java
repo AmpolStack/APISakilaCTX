@@ -1,4 +1,4 @@
-package com.sakila.sakila_project.domain.adapters.input;
+package com.sakila.sakila_project.domain.ports.output;
 
 import java.io.InputStream;
 

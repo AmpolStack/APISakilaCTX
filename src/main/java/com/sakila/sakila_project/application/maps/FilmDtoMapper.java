@@ -1,4 +1,4 @@
-package com.sakila.sakila_project.infrastructure.maps;
+package com.sakila.sakila_project.application.maps;
 
 public interface FilmDtoMapper {
 }

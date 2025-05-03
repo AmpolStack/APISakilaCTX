@@ -1,13 +1,13 @@
-package com.sakila.sakila_project.infrastructure.usecases;
+package com.sakila.sakila_project.infrastructure.adapters.output;
 
-import com.sakila.sakila_project.infrastructure.custom.AuthenticationRequest;
-import com.sakila.sakila_project.infrastructure.custom.AuthenticationResponse;
-import com.sakila.sakila_project.infrastructure.custom.Credentials;
-import com.sakila.sakila_project.domain.adapters.input.IJwtService;
+import com.sakila.sakila_project.application.custom.AuthenticationRequest;
+import com.sakila.sakila_project.application.custom.AuthenticationResponse;
+import com.sakila.sakila_project.application.custom.Credentials;
+import com.sakila.sakila_project.domain.ports.input.IJwtService;
 import com.sakila.sakila_project.domain.model.sakila.Staff;
 import com.sakila.sakila_project.domain.model.tokens.TokenRegistration;
-import com.sakila.sakila_project.application.adapters.output.repositories.sakila.StaffRepository;
-import com.sakila.sakila_project.application.adapters.output.repositories.tokens.TokenRegistrationRepository;
+import com.sakila.sakila_project.domain.ports.output.repositories.sakila.StaffRepository;
+import com.sakila.sakila_project.domain.ports.output.repositories.tokens.TokenRegistrationRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;

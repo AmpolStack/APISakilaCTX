@@ -1,7 +1,7 @@
-package com.sakila.sakila_project.infrastructure.maps;
+package com.sakila.sakila_project.application.maps;
 
-import com.sakila.sakila_project.infrastructure.dto.MinActorDto;
-import com.sakila.sakila_project.infrastructure.dto.MinStaffDto;
+import com.sakila.sakila_project.application.dto.MinActorDto;
+import com.sakila.sakila_project.application.dto.MinStaffDto;
 import com.sakila.sakila_project.domain.model.sakila.Actor;
 import com.sakila.sakila_project.domain.model.sakila.Staff;
 import org.mapstruct.Mapper;

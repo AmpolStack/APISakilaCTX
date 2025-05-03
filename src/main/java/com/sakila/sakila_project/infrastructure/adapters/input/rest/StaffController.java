@@ -1,13 +1,13 @@
-package com.sakila.sakila_project.application.adapters.input.rest;
+package com.sakila.sakila_project.infrastructure.adapters.input.rest;
 
-import com.sakila.sakila_project.infrastructure.custom.AuthUser;
-import com.sakila.sakila_project.infrastructure.custom.AuthenticationRequest;
-import com.sakila.sakila_project.infrastructure.custom.Credentials;
-import com.sakila.sakila_project.infrastructure.maps.MinimalDtoMapper;
-import com.sakila.sakila_project.infrastructure.maps.StaffDtoMapper;
-import com.sakila.sakila_project.domain.adapters.input.IJwtService;
+import com.sakila.sakila_project.application.custom.AuthUser;
+import com.sakila.sakila_project.application.custom.AuthenticationRequest;
+import com.sakila.sakila_project.application.custom.Credentials;
+import com.sakila.sakila_project.application.maps.MinimalDtoMapper;
+import com.sakila.sakila_project.application.maps.StaffDtoMapper;
+import com.sakila.sakila_project.domain.ports.input.IJwtService;
 import com.sakila.sakila_project.domain.model.sakila.Staff;
-import com.sakila.sakila_project.application.adapters.output.repositories.sakila.StaffRepository;
+import com.sakila.sakila_project.domain.ports.output.repositories.sakila.StaffRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;

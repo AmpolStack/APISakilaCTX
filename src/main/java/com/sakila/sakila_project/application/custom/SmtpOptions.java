@@ -1,4 +1,4 @@
-package com.sakila.sakila_project.infrastructure.custom;
+package com.sakila.sakila_project.application.custom;
 
 import lombok.Getter;
 import lombok.Setter;
