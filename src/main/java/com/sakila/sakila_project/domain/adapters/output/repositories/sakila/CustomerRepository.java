@@ -1,4 +1,4 @@
-package com.sakila.sakila_project.application.adapters.output.repositories.sakila;
+package com.sakila.sakila_project.infrastructure.adapters.output.repositories.sakila;
 
 import com.sakila.sakila_project.domain.model.sakila.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
