@@ -1,8 +1,8 @@
 package com.sakila.sakila_project.domain.adapters.input;
 
-import com.sakila.sakila_project.application.custom.AuthenticationRequest;
-import com.sakila.sakila_project.application.custom.AuthenticationResponse;
-import com.sakila.sakila_project.application.custom.Credentials;
+import com.sakila.sakila_project.infrastructure.custom.AuthenticationRequest;
+import com.sakila.sakila_project.infrastructure.custom.AuthenticationResponse;
+import com.sakila.sakila_project.infrastructure.custom.Credentials;
 import io.jsonwebtoken.Claims;
 import java.util.*;
 
