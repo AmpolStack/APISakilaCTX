@@ -38,7 +38,7 @@ public class ActorController {
     }
 
     @GetMapping("/getAllActorsInfo")
-    public ResponseEntity getAllActors() {
+    public ResponseEntity<?> getAllActors() {
         try{
             var actors = this.actorRepository.findActors();
             var maps = this.minimalDtoMapper.toMinimalActorDtoList(actors);
@@ -50,7 +50,7 @@ public class ActorController {
     }
 
     @GetMapping("/getActorById")
-    public ResponseEntity getActorAllInfo(@RequestParam int id) {
+    public ResponseEntity<?> getActorAllInfo(@RequestParam int id) {
         try{
             var actor = this.actorRepository.findById(id);
 
@@ -67,7 +67,7 @@ public class ActorController {
     }
 
     @DeleteMapping("/auth/deleteActorById")
-    public ResponseEntity deleteActorById(@RequestParam int id) {
+    public ResponseEntity<?> deleteActorById(@RequestParam int id) {
         try{
 
             if(!this.actorRepository.existsById(id)){
@@ -86,7 +86,7 @@ public class ActorController {
 
 
     @PostMapping("/auth/createActor")
-    public ResponseEntity createActor(@RequestBody MinActorDto actor) {
+    public ResponseEntity<?> createActor(@RequestBody MinActorDto actor) {
         try{
 
             var map = this.minimalDtoMapper.toActor(actor);
@@ -100,7 +100,7 @@ public class ActorController {
     }
 
     @PutMapping("/auth/updateActor")
-    public ResponseEntity updateActor(@RequestBody MinActorDto actor,
+    public ResponseEntity<?> updateActor(@RequestBody MinActorDto actor,
                                       @RequestParam int id) {
         try{
 
@@ -120,7 +120,7 @@ public class ActorController {
     }
 
     @PatchMapping("/auth/addFilmWithActorById")
-    public ResponseEntity addFilm(@RequestParam int actorId, @RequestParam int filmId){
+    public ResponseEntity<?> addFilm(@RequestParam int actorId, @RequestParam int filmId){
         try{
            var actorOpt = this.actorRepository.findById(actorId);
            if(actorOpt.isEmpty()){
@@ -145,7 +145,7 @@ public class ActorController {
     }
 
     @GetMapping("/CheckEmail")
-    public ResponseEntity checkEmail(@RequestParam String email) {
+    public ResponseEntity<?> checkEmail(@RequestParam String email) {
         var randomNumber = generateRandomNumber(8);
         try{
             this.emailService.SendEmail(
