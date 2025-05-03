@@ -17,7 +17,7 @@ import java.util.Objects;
 
 @Configuration
 @EnableJpaRepositories(
-        basePackages = "com.sakila.sakila_project.infrastructure.adapters.output.repositories.tokens",
+        basePackages = "com.sakila.sakila_project.domain.ports.output.repositories.tokens",
         entityManagerFactoryRef = "TokensEMF",
         transactionManagerRef = "TokensTM"
 )
