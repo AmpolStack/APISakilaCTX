@@ -14,7 +14,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 public class RedisConfiguration {
     @Bean(name = "primaryRedisStandalone")
     @Primary
-    @ConfigurationProperties(prefix = "redis.primary")
+    @ConfigurationProperties(prefix = "spring.redis.primary")
     public RedisStandaloneConfiguration redisStandaloneConfiguration() {
         return new RedisStandaloneConfiguration();
     }

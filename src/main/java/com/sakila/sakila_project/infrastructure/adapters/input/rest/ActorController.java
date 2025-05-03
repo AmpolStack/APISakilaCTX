@@ -21,13 +21,14 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/actors")
 public class ActorController {
 
-    @Value("${email.Username}")
+    @Value("${spring.email.username}")
     private String emailSenderAddress;
 
-    @Value("${operation.expiration.time}")
+    @Value("${spring.application.request.expirationTime}")
     private int expirationRequestTime;
-    @Value("${operation.code.legth}")
-    private int codeLegth;
+
+    @Value("${spring.application.request.codeLength}")
+    private int codeLength;
 
     private final ActorRepository actorRepository;
     private final FilmRepository filmRepository;
@@ -165,6 +166,7 @@ public class ActorController {
                     emailSenderAddress,
                     email
                     );
+
             this.redisTemplate.opsForValue().set(email, randomNumber, expirationRequestTime, TimeUnit.MINUTES);
             return ResponseEntity.ok(randomNumber);
         }
@@ -198,9 +200,9 @@ public class ActorController {
 
     private String generateRandomNumber(){
         var rnd = new Random();
-        var max = (int)Math.pow(10,codeLegth);
+        var max = (int)Math.pow(10, codeLength);
         var number = rnd.nextInt(max);
-        return String.format("%0" + codeLegth + "d", number);
+        return String.format("%0" + codeLength + "d", number);
     }
 
 }

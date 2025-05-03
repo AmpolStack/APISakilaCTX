@@ -25,8 +25,9 @@ public class StaffController {
     @Value("${spring.security.jwt.token.expirationMs}")
     private int tokenExpiration;
 
-    @Value("${spring.security.jwt.refresh.token.expirationMs}")
+    @Value("${spring.security.jwt.refresh.expirationMs}")
     private int refreshTokenExpiration;
+
     private final StaffRepository repository;
     private final MinimalDtoMapper minimalDtoMapper;
     private final StaffDtoMapper staffDtoMapper;

@@ -13,7 +13,7 @@ import java.util.Properties;
 public class SmtpConfiguration {
 
     @Bean
-    @ConfigurationProperties(prefix = "email")
+    @ConfigurationProperties(prefix = "spring.email")
     public SmtpOptions smtpOptions(){ return new SmtpOptions();}
 
     @Bean
