@@ -21,7 +21,7 @@ import java.util.*;
 @Service
 public class JwtService implements IJwtService {
 
-    @Value("${spring.security.jwt.secret}")
+    @Value("${spring.security.jwt.token.secret}")
     private String secret;
 
     private final TokenRegistrationRepository tokenRepository;

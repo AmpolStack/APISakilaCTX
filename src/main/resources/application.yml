@@ -11,19 +11,26 @@ spring:
       url: jdbc:mysql://localhost:3307/jwt_db
       driver-class-name: com.mysql.cj.jdbc.Driver
       dialect: org.hibernate.dialect.MySQL8Dialect
+      ## username: your_database_username
+      ## password: your_database_password
     sakila:
       url: jdbc:mariadb://localhost:3306/sakila
       driver-class-name: org.mariadb.jdbc.Driver
       dialect: org.hibernate.dialect.MariaDBDialect
+      ## username: your_database_username
+      ## password: your_database_password
   jpa:
     show-sql: true
   security:
     jwt:
       token:
+        ## secret: your_256_bits_string_secret
         expirationMs: 60000
       refresh:
         expirationMs: 180000
   email:
+    ## username: your_email_address_name
+    ## password: your_email_address_password
     port: 587
     host: smtp.gmail.com
     transportProtocol: smtp
@@ -32,5 +39,6 @@ spring:
     debug: true
   redis:
     primary:
+      ## password: your_redis_database_password
       host: localhost
       port: 6379
