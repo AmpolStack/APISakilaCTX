@@ -25,7 +25,7 @@ public class JwtSecurityFilter extends OncePerRequestFilter {
 
     private final IJwtService _jwtService;
     private final HandlerExceptionResolver handlerExceptionResolver;
-    @Value("${spring.security.jwt.token.secret}")
+    @Value("${spring.security.jwt.secret}")
     private String _secret;
 
     @Autowired

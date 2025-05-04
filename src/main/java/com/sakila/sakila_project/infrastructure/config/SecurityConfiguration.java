@@ -30,9 +30,10 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfiguration {
     private final JwtSecurityFilter jwtSecurityFilter;
+
     @Bean
     @ConfigurationProperties(prefix = "spring.security.jwt")
-    public AuthenticationParams authenticationParams() {
+    public AuthenticationParams gauthenticationParams() {
         return new AuthenticationParams();
     }
     @Autowired
