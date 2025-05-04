@@ -1,6 +1,6 @@
 package com.sakila.sakila_project.infrastructure.filters;
 
-import com.sakila.sakila_project.application.custom.AuthUser;
+import com.sakila.sakila_project.application.custom.authentication.AuthenticatedUser;
 import com.sakila.sakila_project.domain.ports.input.IJwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -84,7 +84,7 @@ public class JwtSecurityFilter extends OncePerRequestFilter {
 
         log.info("CREATE AUTHENTICATION INSTANCE FOR : {}", name);
 
-        var user = new AuthUser();
+        var user = new AuthenticatedUser();
         user.setId(Integer.parseInt(id));
         user.setUsername(name);
         user.setPassword(id);

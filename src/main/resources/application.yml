@@ -26,7 +26,7 @@ spring:
       tokenExpiration: 60000
       ## secret: your_256_bits_string_secret
       refreshTokenExpiration: 180000
-
+      latencyInMs: 5000
   email:
     ## username: your_email_address_name
     ## password: your_email_address_password

@@ -1,8 +1,10 @@
 package com.sakila.sakila_project.infrastructure.config;
 
+import com.sakila.sakila_project.application.custom.authentication.AuthenticationParams;
 import com.sakila.sakila_project.infrastructure.filters.JwtSecurityFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -28,11 +30,17 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfiguration {
     private final JwtSecurityFilter jwtSecurityFilter;
-
+    @Bean
+    @ConfigurationProperties(prefix = "spring.security.jwt")
+    public AuthenticationParams authenticationParams() {
+        return new AuthenticationParams();
+    }
     @Autowired
     public SecurityConfiguration(JwtSecurityFilter jwtSecurityFilter) {
         this.jwtSecurityFilter = jwtSecurityFilter;
     }
+
+
 
     @Bean
     @Order(1)
