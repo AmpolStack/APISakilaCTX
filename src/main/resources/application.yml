@@ -23,11 +23,10 @@ spring:
     show-sql: true
   security:
     jwt:
-      token:
-        ## secret: your_256_bits_string_secret
-        expirationMs: 60000
-      refresh:
-        expirationMs: 180000
+      tokenExpiration: 60000
+      ## secret: your_256_bits_string_secret
+      refreshTokenExpiration: 180000
+
   email:
     ## username: your_email_address_name
     ## password: your_email_address_password
