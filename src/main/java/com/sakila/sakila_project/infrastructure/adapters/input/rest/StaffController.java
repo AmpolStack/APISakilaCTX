@@ -5,11 +5,14 @@ import com.sakila.sakila_project.application.custom.authentication.Authenticatio
 import com.sakila.sakila_project.application.custom.authentication.AuthenticationCredentials;
 import com.sakila.sakila_project.application.maps.MinimalDtoMapper;
 import com.sakila.sakila_project.application.maps.StaffDtoMapper;
-import com.sakila.sakila_project.domain.ports.input.IJwtService;
+import com.sakila.sakila_project.application.usecases.ports.IAuthStaffUseCase;
+import com.sakila.sakila_project.domain.exceptions.InvalidAuthenticationException;
+import com.sakila.sakila_project.domain.exceptions.InvalidCredentialsException;
+import com.sakila.sakila_project.domain.exceptions.TokenExpiredException;
 import com.sakila.sakila_project.domain.model.sakila.Staff;
 import com.sakila.sakila_project.domain.ports.output.repositories.sakila.StaffRepository;
+import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,40 +20,35 @@ import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.function.Function;
 
 @RestController
 @RequestMapping("/staff")
 public class StaffController {
 
-    @Value("${spring.security.jwt.token.expirationMs}")
-    private int tokenExpiration;
-
-    @Value("${spring.security.jwt.refresh.expirationMs}")
-    private int refreshTokenExpiration;
-
-    private final StaffRepository repository;
-    private final MinimalDtoMapper minimalDtoMapper;
-    private final StaffDtoMapper staffDtoMapper;
-    private final IJwtService jwtService;
+    private final StaffRepository _repository;
+    private final MinimalDtoMapper _minimalDtoMapper;
+    private final StaffDtoMapper _staffDtoMapper;
+    private final IAuthStaffUseCase _authStaffUseCase;
 
 
     @Autowired
     public StaffController(StaffRepository repository,
                            MinimalDtoMapper minimalDtoMapper,
                            StaffDtoMapper staffDtoMapper,
-                           IJwtService jwtService) {
-        this.repository = repository;
-        this.minimalDtoMapper = minimalDtoMapper;
-        this.staffDtoMapper = staffDtoMapper;
-        this.jwtService = jwtService;
+                           IAuthStaffUseCase authStaffUseCase) {
+        _repository = repository;
+        _minimalDtoMapper = minimalDtoMapper;
+        _staffDtoMapper = staffDtoMapper;
+        _authStaffUseCase = authStaffUseCase;
     }
 
 
     @GetMapping("/getAllStaffs")
     public ResponseEntity<?> getAllStaffs(){
         try{
-            List<Staff> staffs = repository.findAll();
-            var maps = this.minimalDtoMapper.toMinStaffDtoList(staffs);
+            List<Staff> staffs = _repository.findAll();
+            var maps = _minimalDtoMapper.toMinStaffDtoList(staffs);
             return ResponseEntity.status(HttpStatus.OK).body(maps);
         }
         catch(Exception e){
@@ -70,14 +68,14 @@ public class StaffController {
             }
 
             var id = ((AuthenticatedUser) auth.getPrincipal()).getId();
-            var staffOp = this.repository.findById(id);
+            var staffOp = _repository.findById(id);
 
             if(staffOp.isEmpty()){
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Staff not found");
             }
 
             var staff = staffOp.get();
-            var mapped = this.staffDtoMapper.toDto(staff);
+            var mapped = _staffDtoMapper.toDto(staff);
             return ResponseEntity.status(HttpStatus.OK).body(mapped);
 
         }
@@ -88,30 +86,30 @@ public class StaffController {
 
     @PostMapping("/open/obtainAuthentication")
     public ResponseEntity<?> obtainAuthentication(@RequestBody AuthenticationCredentials credentials){
-        try{
-            var auth = this.jwtService.AuthenticateByCredentials(credentials, refreshTokenExpiration, tokenExpiration);
-            if(!auth.isSuccess()){
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(auth.getMessage());
-            }
-            return ResponseEntity.status(HttpStatus.OK).body(auth);
-        }
-        catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+        return GeneralizedAuthentication(x -> x.Authenticate(credentials));
     }
 
     @PostMapping("/open/refreshAuthentication")
     public ResponseEntity<?> refreshAuthentication(@RequestBody AuthenticationBridge authenticationRequest){
-        try{
-            var auth = this.jwtService.AuthenticateByRefreshToken(authenticationRequest, tokenExpiration, refreshTokenExpiration);
-            if(!auth.isSuccess()){
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(auth.getMessage());
-            }
+        return GeneralizedAuthentication(x -> x.Authenticate(authenticationRequest));
+    }
 
-            return ResponseEntity.status(HttpStatus.OK).body(auth);
+    private ResponseEntity<?> GeneralizedAuthentication(Function<IAuthStaffUseCase, AuthenticationBridge> function){
+        try{
+            var action = function.apply(_authStaffUseCase);
+            return ResponseEntity.status(HttpStatus.OK).body(action);
+        }
+        catch (InvalidCredentialsException ex){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
+        catch (InvalidAuthenticationException | TokenExpiredException ex){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+        }
+        catch (JwtException ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
         catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(ex.getMessage());
         }
     }
 

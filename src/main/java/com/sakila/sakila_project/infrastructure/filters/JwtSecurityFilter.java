@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,12 +23,14 @@ import java.io.IOException;
 @Slf4j
 public class JwtSecurityFilter extends OncePerRequestFilter {
 
-    private final IJwtService jwtService;
+    private final IJwtService _jwtService;
     private final HandlerExceptionResolver handlerExceptionResolver;
+    @Value("${spring.security.jwt.token.secret}")
+    private String _secret;
 
     @Autowired
     public JwtSecurityFilter(IJwtService jwtService, HandlerExceptionResolver handlerExceptionResolver) {
-        this.jwtService = jwtService;
+        _jwtService = jwtService;
         this.handlerExceptionResolver = handlerExceptionResolver;
     }
 
@@ -61,13 +64,13 @@ public class JwtSecurityFilter extends OncePerRequestFilter {
 
         final var token = tokenHeader.substring("Bearer ".length());
 
-        if(!this.jwtService.isTokenValid(token)){
+        if(!this._jwtService.IsTokenExpired(token, _secret)){
             log.error("the token is invalid");
             return;
         }
 
         log.info("PROCESSING TOKEN... {}", token);
-        final var claims = this.jwtService.getAllClaims(token);
+        final var claims = this._jwtService.GetAllClaims(token, _secret);
         var name = claims.getSubject();
         var id = claims.getId();
         var phone = claims.get("phone", String.class);
@@ -87,7 +90,6 @@ public class JwtSecurityFilter extends OncePerRequestFilter {
         var user = new AuthenticatedUser();
         user.setId(Integer.parseInt(id));
         user.setUsername(name);
-        user.setPassword(id);
         user.setEmail(email);
         user.setPhone(phone);
 
