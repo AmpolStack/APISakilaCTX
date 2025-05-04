@@ -2,6 +2,8 @@ package com.sakila.sakila_project.application.usecases.adapters;
 
 import com.sakila.sakila_project.application.custom.authentication.*;
 import com.sakila.sakila_project.application.usecases.ports.IAuthStaffUseCase;
+import com.sakila.sakila_project.domain.exceptions.InvalidAuthenticationException;
+import com.sakila.sakila_project.domain.exceptions.InvalidCredentialsException;
 import com.sakila.sakila_project.domain.exceptions.TokenExpiredException;
 import com.sakila.sakila_project.domain.model.sakila.Staff;
 import com.sakila.sakila_project.domain.model.tokens.TokenRegistration;
@@ -14,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -37,32 +38,37 @@ public class AuthStaffUseCase implements IAuthStaffUseCase {
     }
 
     @Override
-    public AuthenticationBridge Authenticate(AuthenticationCredentials credentials, AuthenticationParams params) {
+    public AuthenticationBridge Authenticate(AuthenticationCredentials credentials) {
+
+        if(credentials.getUsername().isEmpty()
+                || credentials.getPassword().isEmpty()
+                || credentials.getUsername().isBlank()
+                || credentials.getPassword().isBlank()) {
+            throw new InvalidCredentialsException("Invalid credentials");
+        }
+
         var staffOp = _staffRepository.findStaffByUsernameAndPassword(credentials.getUsername(), credentials.getPassword());
-        return SaveRegistry(staffOp, params);
+        var staff = staffOp.orElseThrow(() -> new InvalidCredentialsException("No exist staff registered with this credentials"));
+        return SaveRegistry(staff);
     }
 
     @Override
-    public AuthenticationBridge Authenticate(AuthenticationBridge authenticationRequest, AuthenticationParams params) {
+    public AuthenticationBridge Authenticate(AuthenticationBridge authenticationRequest) {
 
         Optional<TokenRegistration> registrationOp;
         registrationOp = _tokenRegistrationRepository.findTokenRegistrationByTokenAndRefreshToken(
                     authenticationRequest.getToken(),
                     authenticationRequest.getRefreshToken());
 
-        if(registrationOp.isEmpty()){
-            throw new NoSuchElementException("The tokens are not registered");
-        }
+        var registration = registrationOp.orElseThrow(() -> new InvalidCredentialsException("This credentials does not exist"));
 
-        var registration = registrationOp.get();
         if(registration.getExpirationDate().before(new Date())){
             throw new TokenExpiredException("Refresh Token has expired, please login again");
         }
 
-        Optional<Staff> staffOp;
-        staffOp = _staffRepository.findById(registration.getIdUser());
-
-        return SaveRegistry(staffOp, params);
+        var staffOp = _staffRepository.findById(registration.getIdUser());
+        var staff = staffOp.orElseThrow(()-> new InvalidAuthenticationException("No exist staff registered with this tokens"));
+        return SaveRegistry(staff);
     }
 
     @Override
@@ -77,17 +83,10 @@ public class AuthStaffUseCase implements IAuthStaffUseCase {
     }
 
 
-    private AuthenticationBridge SaveRegistry(Optional<Staff> staffOp, AuthenticationParams params) {
+    private AuthenticationBridge SaveRegistry(Staff staff) {
 
-        if (staffOp.isEmpty()) {
-            throw new NoSuchElementException("No staff registered with this id");
-        }
-
-        var staff = staffOp.get();
         var claims = StaffEntityToClaimsMap(staff);
-        String token = "";
-
-        token = _jwtService.GenerateToken(claims, params.getTokenExpiration(), params.getSecret());
+        var token = _jwtService.GenerateToken(claims, _authenticationParams.getTokenExpiration(), _authenticationParams.getSecret());
 
         var refreshToken = _jwtService.GenerateRefreshToken();
 
@@ -97,7 +96,7 @@ public class AuthStaffUseCase implements IAuthStaffUseCase {
         tokenRegistration.setActive(true);
         tokenRegistration.setIdUser(staff.getId());
         tokenRegistration.setCreationDate(new Date());
-        tokenRegistration.setExpirationDate(new Date(new Date().getTime() + params.getTokenExpiration() + _authenticationParams.getLatencyInMs()));
+        tokenRegistration.setExpirationDate(new Date(new Date().getTime() + _authenticationParams.getRefreshTokenExpiration() + _authenticationParams.getLatencyInMs()));
 
         _tokenRegistrationRepository.save(tokenRegistration);
 
