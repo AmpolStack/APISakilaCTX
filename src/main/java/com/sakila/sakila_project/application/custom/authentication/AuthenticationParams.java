@@ -9,4 +9,5 @@ public class AuthenticationParams {
     private int TokenExpiration;
     private int RefreshTokenExpiration;
     private String Secret;
+    private int latencyInMs;
 }

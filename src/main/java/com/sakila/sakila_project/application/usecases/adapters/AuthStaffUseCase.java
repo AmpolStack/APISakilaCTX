@@ -2,6 +2,7 @@ package com.sakila.sakila_project.application.usecases.adapters;
 
 import com.sakila.sakila_project.application.custom.authentication.*;
 import com.sakila.sakila_project.application.usecases.ports.IAuthStaffUseCase;
+import com.sakila.sakila_project.domain.exceptions.TokenExpiredException;
 import com.sakila.sakila_project.domain.model.sakila.Staff;
 import com.sakila.sakila_project.domain.model.tokens.TokenRegistration;
 import com.sakila.sakila_project.domain.ports.input.IJwtService;
@@ -9,11 +10,11 @@ import com.sakila.sakila_project.domain.ports.output.repositories.sakila.StaffRe
 import com.sakila.sakila_project.domain.ports.output.repositories.tokens.TokenRegistrationRepository;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -36,43 +37,30 @@ public class AuthStaffUseCase implements IAuthStaffUseCase {
     }
 
     @Override
-    public AuthenticationResponse Authenticate(AuthenticationCredentials credentials, AuthenticationParams params) {
+    public AuthenticationBridge Authenticate(AuthenticationCredentials credentials, AuthenticationParams params) {
         var staffOp = _staffRepository.findStaffByUsernameAndPassword(credentials.getUsername(), credentials.getPassword());
         return SaveRegistry(staffOp, params);
     }
 
     @Override
-    public AuthenticationResponse Authenticate(AuthenticationRequest authenticationRequest, AuthenticationParams params) {
+    public AuthenticationBridge Authenticate(AuthenticationBridge authenticationRequest, AuthenticationParams params) {
 
         Optional<TokenRegistration> registrationOp;
-        try{
-            registrationOp = _tokenRegistrationRepository.findTokenRegistrationByTokenAndRefreshToken(
+        registrationOp = _tokenRegistrationRepository.findTokenRegistrationByTokenAndRefreshToken(
                     authenticationRequest.getToken(),
                     authenticationRequest.getRefreshToken());
-        }
-        catch(Exception e){
-            return new AuthenticationResponse(
-                    "Internal server error",
-                    Boolean.FALSE,
-                    500
-            );
-        }
-
 
         if(registrationOp.isEmpty()){
-            return new AuthenticationResponse(
-                    "Token not foud",
-                    Boolean.FALSE);
+            throw new NoSuchElementException("The tokens are not registered");
         }
 
         var registration = registrationOp.get();
+        if(registration.getExpirationDate().before(new Date())){
+            throw new TokenExpiredException("Refresh Token has expired, please login again");
+        }
+
         Optional<Staff> staffOp;
-        try{
-            staffOp = _staffRepository.findById(registration.getIdUser());
-        }
-        catch(Exception e){
-            return new AuthenticationResponse("Internal server error", Boolean.FALSE, 500);
-        }
+        staffOp = _staffRepository.findById(registration.getIdUser());
 
         return SaveRegistry(staffOp, params);
     }
@@ -89,26 +77,17 @@ public class AuthStaffUseCase implements IAuthStaffUseCase {
     }
 
 
-    private AuthenticationResponse SaveRegistry(Optional<Staff> staffOp, AuthenticationParams params) {
+    private AuthenticationBridge SaveRegistry(Optional<Staff> staffOp, AuthenticationParams params) {
 
         if (staffOp.isEmpty()) {
-            return new AuthenticationResponse(
-                    "User not found",
-                    Boolean.FALSE);
+            throw new NoSuchElementException("No staff registered with this id");
         }
 
         var staff = staffOp.get();
         var claims = StaffEntityToClaimsMap(staff);
         String token = "";
 
-        try{
-            token = _jwtService.GenerateToken(claims, params.getTokenExpiration(), params.getSecret());
-        }
-        catch(Exception e){
-            return new AuthenticationResponse(
-                    "Token generation is failed",
-                    Boolean.FALSE);
-        }
+        token = _jwtService.GenerateToken(claims, params.getTokenExpiration(), params.getSecret());
 
         var refreshToken = _jwtService.GenerateRefreshToken();
 
@@ -120,18 +99,9 @@ public class AuthStaffUseCase implements IAuthStaffUseCase {
         tokenRegistration.setCreationDate(new Date());
         tokenRegistration.setExpirationDate(new Date(new Date().getTime() + params.getTokenExpiration() + _authenticationParams.getLatencyInMs()));
 
-        try{
-            _tokenRegistrationRepository.save(tokenRegistration);
-        }
-        catch(Exception e){
-            return new AuthenticationResponse(
-                    "Token registration failed",
-                    Boolean.FALSE);
-        }
+        _tokenRegistrationRepository.save(tokenRegistration);
 
-        return new AuthenticationResponse(
-                "Successfully authenticated",
-                Boolean.TRUE,
+        return new AuthenticationBridge(
                 token,
                 refreshToken);
     }

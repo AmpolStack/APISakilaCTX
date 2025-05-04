@@ -1,8 +1,8 @@
 package com.sakila.sakila_project.infrastructure.adapters.input.rest;
 
-import com.sakila.sakila_project.application.custom.AuthUser;
-import com.sakila.sakila_project.application.custom.AuthenticationRequest;
-import com.sakila.sakila_project.application.custom.Credentials;
+import com.sakila.sakila_project.application.custom.authentication.AuthenticatedUser;
+import com.sakila.sakila_project.application.custom.authentication.AuthenticationBridge;
+import com.sakila.sakila_project.application.custom.authentication.AuthenticationCredentials;
 import com.sakila.sakila_project.application.maps.MinimalDtoMapper;
 import com.sakila.sakila_project.application.maps.StaffDtoMapper;
 import com.sakila.sakila_project.domain.ports.input.IJwtService;
@@ -65,11 +65,11 @@ public class StaffController {
 
             var auth = SecurityContextHolder.getContext().getAuthentication();
 
-            if(!(auth.getPrincipal() instanceof AuthUser)){
+            if(!(auth.getPrincipal() instanceof AuthenticatedUser)){
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This user not have permission to access this resource");
             }
 
-            var id = ((AuthUser) auth.getPrincipal()).getId();
+            var id = ((AuthenticatedUser) auth.getPrincipal()).getId();
             var staffOp = this.repository.findById(id);
 
             if(staffOp.isEmpty()){
@@ -87,7 +87,7 @@ public class StaffController {
     }
 
     @PostMapping("/open/obtainAuthentication")
-    public ResponseEntity<?> obtainAuthentication(@RequestBody Credentials credentials){
+    public ResponseEntity<?> obtainAuthentication(@RequestBody AuthenticationCredentials credentials){
         try{
             var auth = this.jwtService.AuthenticateByCredentials(credentials, refreshTokenExpiration, tokenExpiration);
             if(!auth.isSuccess()){
@@ -101,7 +101,7 @@ public class StaffController {
     }
 
     @PostMapping("/open/refreshAuthentication")
-    public ResponseEntity<?> refreshAuthentication(@RequestBody AuthenticationRequest authenticationRequest){
+    public ResponseEntity<?> refreshAuthentication(@RequestBody AuthenticationBridge authenticationRequest){
         try{
             var auth = this.jwtService.AuthenticateByRefreshToken(authenticationRequest, tokenExpiration, refreshTokenExpiration);
             if(!auth.isSuccess()){

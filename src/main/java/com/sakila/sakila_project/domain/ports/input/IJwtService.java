@@ -1,13 +1,7 @@
 package com.sakila.sakila_project.domain.ports.input;
 
-import com.sakila.sakila_project.application.custom.authentication.AuthenticationRequest;
-import com.sakila.sakila_project.application.custom.authentication.AuthenticationResponse;
-import com.sakila.sakila_project.application.custom.authentication.AuthenticationCredentials;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 
-import javax.crypto.SecretKey;
 import java.util.*;
 
 public interface IJwtService {
