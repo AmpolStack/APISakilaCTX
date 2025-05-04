@@ -1,29 +1,21 @@
 package com.sakila.sakila_project.domain.ports.input;
 
-import com.sakila.sakila_project.application.custom.AuthenticationRequest;
-import com.sakila.sakila_project.application.custom.AuthenticationResponse;
-import com.sakila.sakila_project.application.custom.Credentials;
+import com.sakila.sakila_project.application.custom.authentication.AuthenticationRequest;
+import com.sakila.sakila_project.application.custom.authentication.AuthenticationResponse;
+import com.sakila.sakila_project.application.custom.authentication.AuthenticationCredentials;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+
+import javax.crypto.SecretKey;
 import java.util.*;
 
 public interface IJwtService {
-    AuthenticationResponse AuthenticateByRefreshToken(AuthenticationRequest authenticationRequest,
-                                                      int refreshTokenExpiration,
-                                                      int tokenExpiration);
-
-    AuthenticationResponse AuthenticateByCredentials(Credentials credentials,
-                                                            int refreshTokenExpiration,
-                                                            int tokenExpiration);
-
-    boolean isTokenValid(String token);
-
-    List<Object> getClaimsList(String token,
-                               Map<String,
-                               Class<?>> map);
-
-    <T> T getClaim(String token,
-                   String claimName,
-                   Class<T> claimType);
-
-    Claims getAllClaims(String token);
+    String GenerateToken(Map<String, String> claims, int expiration, String secret);
+    String GenerateToken(Map<String, String> claims, String subject, int expiration, String secret);
+    String GenerateRefreshToken();
+    boolean IsTokenExpired(String token, String secret);
+    List<Object> GetClaimsList(String token, String secret, Map<String, Class<?>> map);
+    <T> T GetClaim(String token, String secret, String claimName, Class<T> claimType);
+    Claims GetAllClaims(String token, String secret);
 }

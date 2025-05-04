@@ -10,17 +10,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Setter
-public class AuthUser implements UserDetails {
-
-    @Getter
-    private int id;
-    private String username;
-    private String password;
-    @Getter
-    private String phone;
-    @Getter
-    private String email;
-
+public class AuthenticatedUser extends AuthenticatedUserMetadata implements UserDetails {
 
     //THE DATABASE NO CONTAINS ROLE ENTITIES YET, BECAUSE IS NEEDED TO WRITE THE ROLE HARDCODE
     @Override
@@ -30,7 +20,7 @@ public class AuthUser implements UserDetails {
 
     @Override
     public String getPassword() {
-        return this.password;
+        return null;
     }
 
     @Override

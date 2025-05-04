@@ -1,18 +1,9 @@
 package com.sakila.sakila_project.infrastructure.adapters.output;
 
-import com.sakila.sakila_project.application.custom.AuthenticationRequest;
-import com.sakila.sakila_project.application.custom.AuthenticationResponse;
-import com.sakila.sakila_project.application.custom.Credentials;
 import com.sakila.sakila_project.domain.ports.input.IJwtService;
-import com.sakila.sakila_project.domain.model.sakila.Staff;
-import com.sakila.sakila_project.domain.model.tokens.TokenRegistration;
-import com.sakila.sakila_project.domain.ports.output.repositories.sakila.StaffRepository;
-import com.sakila.sakila_project.domain.ports.output.repositories.tokens.TokenRegistrationRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -21,136 +12,37 @@ import java.util.*;
 @Service
 public class JwtService implements IJwtService {
 
-    @Value("${spring.security.jwt.token.secret}")
-    private String secret;
-
-    private final TokenRegistrationRepository tokenRepository;
-    private final StaffRepository staffRepository;
-
-    @Autowired
-    public JwtService(TokenRegistrationRepository tokenRepository, StaffRepository staffRepository) {
-        this.tokenRepository = tokenRepository;
-        this.staffRepository = staffRepository;
+    public String GenerateToken(Map<String, String> claims, int expiration, String secret) {
+        return Jwts.builder()
+                .claims(claims)
+                .issuedAt(new Date())
+                .expiration(new Date(new Date().getTime() + expiration))
+                .signWith(GetSecretKey(secret))
+                .compact();
     }
 
-    private SecretKey getSecretKey() {
-        var keyBytes = secret.getBytes();
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
-
-    public AuthenticationResponse AuthenticateByRefreshToken(AuthenticationRequest authenticationRequest, int refreshTokenExpiration, int tokenExpiration) {
-        var authResponse = new AuthenticationResponse();
-        var tokenRegistryOp = this.tokenRepository.findTokenRegistrationByTokenAndRefreshToken(
-                authenticationRequest.getToken(),
-                authenticationRequest.getRefreshToken()
-        );
-
-        if(tokenRegistryOp.isEmpty()){
-           authResponse.setMessage("Token not found");
-           authResponse.setSuccess(false);
-           return authResponse;
-        }
-
-        var tokenRegistry = tokenRegistryOp.get();
-        if(tokenRegistry.getExpirationDate().before(new Date())){
-            authResponse.setMessage("Token is expired");
-            authResponse.setSuccess(false);
-            return authResponse;
-        }
-
-        var staffOp = this.staffRepository.findById(tokenRegistry.getIdUser());
-        if(staffOp.isEmpty()){
-            authResponse.setMessage("Identifier not found");
-            authResponse.setSuccess(false);
-        }
-
-        SaveRegistration(staffOp.get(), authResponse, refreshTokenExpiration, tokenExpiration);
-        return authResponse;
-
-    }
-
-    public AuthenticationResponse AuthenticateByCredentials(Credentials credentials, int refreshTokenExpiration, int tokenExpiration) {
-        var authResponse = new AuthenticationResponse();
-
-        if(credentials.getUsername().isEmpty() || credentials.getPassword().isEmpty()) {
-            authResponse.setSuccess(false);
-            authResponse.setMessage("Username and Password are required");
-            return authResponse;
-        }
-
-        var staffOp = this.staffRepository.findStaffByUsernameAndPassword(credentials.getUsername(), credentials.getPassword());
-
-        if (staffOp.isEmpty()) {
-            authResponse.setSuccess(false);
-            authResponse.setMessage("Invalid credentials");
-            return authResponse;
-        }
-
-        var staff = staffOp.get();
-
-        SaveRegistration(staff, authResponse, refreshTokenExpiration, tokenExpiration);
-
-        return authResponse;
-    }
-
-    private void SaveRegistration(Staff staff, AuthenticationResponse authResponse, int refreshTokenExpiration, int tokenExpiration) {
-
-        var claimMap = generateClaimsMap(staff);
-        var token = generateToken(claimMap, staff.getUsername(), tokenExpiration);
-        var refreshToken = generateRefreshToken();
-
-        var tokenRegistry = new TokenRegistration();
-        tokenRegistry.setToken(token);
-        tokenRegistry.setRefreshToken(refreshToken);
-        tokenRegistry.setIdUser(staff.getId());
-        tokenRegistry.setActive(true);
-        tokenRegistry.setCreationDate(new Date());
-        tokenRegistry.setExpirationDate(new Date(new Date().getTime() + refreshTokenExpiration));
-
-        try{
-            this.tokenRepository.save(tokenRegistry);
-            authResponse.setSuccess(true);
-            authResponse.setMessage("Authentication successful");
-            authResponse.setToken(token);
-            authResponse.setRefreshToken(refreshToken);
-        }
-        catch(Exception e){
-            authResponse.setSuccess(false);
-            authResponse.setMessage("Error saving token, please try again later");
-        }
-
-    }
-
-    private static Map<String, String> generateClaimsMap(Staff staff){
-        var map = new HashMap<String, String>();
-        map.put(Claims.ID, Integer.toString(staff.getId()));
-        map.put("email", staff.getEmail());
-        map.put("phone", staff.getAddress().getPhone());
-        return map;
-    }
-
-    private String generateToken(Map<String, String> claims, String subject, int expiration) {
+    public String GenerateToken(Map<String, String> claims, String subject, int expiration, String secret) {
         return Jwts.builder()
                 .subject(subject)
                 .claims(claims)
                 .issuedAt(new Date())
                 .expiration(new Date(new Date().getTime() + expiration))
-                .signWith(getSecretKey())
+                .signWith(GetSecretKey(secret))
                 .compact();
     }
 
     //128 Bits length
-    private String generateRefreshToken(){
+    public String GenerateRefreshToken(){
         return UUID.randomUUID().toString();
     }
 
-    public boolean isTokenValid(String token) {
-        var claims = getClaimsFromToken(token);
+    public boolean IsTokenExpired(String token, String secret) {
+        var claims = GetClaimsFromToken(token, secret);
         return claims.getExpiration().after(new Date());
     }
 
-    public List<Object> getClaimsList(String token, Map<String, Class<?>> map){
-        var claims = getClaimsFromToken(token);
+    public List<Object> GetClaimsList(String token, String secret, Map<String, Class<?>> map){
+        var claims = GetClaimsFromToken(token, secret);
         var resultList = new ArrayList<>();
 
         map.forEach((k, v) ->{
@@ -166,8 +58,8 @@ public class JwtService implements IJwtService {
     }
 
 
-    public <T> T getClaim(String token, String claimName, Class<T> claimType){
-        var claims = getClaimsFromToken(token);
+    public <T> T GetClaim(String token, String secret, String claimName, Class<T> claimType){
+        var claims = GetClaimsFromToken(token, secret);
         var claimValue = claims.get(claimName);
         if(claimType.isInstance(claimType)){
             return claimType.cast(claimValue);
@@ -177,17 +69,21 @@ public class JwtService implements IJwtService {
         }
     }
 
-    public Claims getAllClaims(String token){
-        return getClaimsFromToken(token);
+    public Claims GetAllClaims(String token, String secret){
+        return GetClaimsFromToken(token, secret);
     }
 
-    private Claims getClaimsFromToken(String token) {
+    private Claims GetClaimsFromToken(String token, String secret) {
         return Jwts
                 .parser()
-                .verifyWith(getSecretKey())
+                .verifyWith(GetSecretKey(secret))
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
     }
 
+    private SecretKey GetSecretKey(String secret) {
+        var keyBytes = secret.getBytes();
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
 }

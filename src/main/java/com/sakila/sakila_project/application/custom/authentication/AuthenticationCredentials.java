@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Credentials {
+public class AuthenticationCredentials {
     private String username;
     private String password;
 }
