@@ -3,11 +3,11 @@ package com.sakila.sakila_project.infrastructure.adapters.output;
 import com.sakila.sakila_project.domain.ports.output.ICacheService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
 
-@Service
+@Component
 public class CacheService implements ICacheService {
 
     private final RedisTemplate<String, Object> redisTemplate;
