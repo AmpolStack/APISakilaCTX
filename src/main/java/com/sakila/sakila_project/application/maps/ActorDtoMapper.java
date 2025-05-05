@@ -1,7 +1,7 @@
 package com.sakila.sakila_project.application.maps;
 
-import com.sakila.sakila_project.application.dto.ExtActorDto;
-import com.sakila.sakila_project.application.dto.ExtFilmDto;
+import com.sakila.sakila_project.application.dto.ExtendedActorDto;
+import com.sakila.sakila_project.application.dto.ExtendedFilmDto;
 import com.sakila.sakila_project.domain.model.sakila.Actor;
 import com.sakila.sakila_project.domain.model.sakila.Film;
 import com.sakila.sakila_project.domain.model.sakila.Language;
@@ -14,9 +14,9 @@ import org.mapstruct.Named;
 public interface ActorDtoMapper {
 
     @Mapping(target = "language", qualifiedByName = "LanguageObjectToString")
-    ExtFilmDto toFilmWithLanguageDto(Film film);
+    ExtendedFilmDto toFilmWithLanguageDto(Film film);
 
-    ExtActorDto toActorWithFilmDto(Actor dto);
+    ExtendedActorDto toActorWithFilmDto(Actor dto);
 
     @Named("LanguageObjectToString")
     default String toLanguageObjectToString(Language language) {
