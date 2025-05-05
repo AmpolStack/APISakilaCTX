@@ -3,15 +3,17 @@ package com.sakila.sakila_project.infrastructure.adapters.input.rest;
 import com.sakila.sakila_project.application.custom.authentication.AuthenticatedUser;
 import com.sakila.sakila_project.application.custom.authentication.AuthenticationBridge;
 import com.sakila.sakila_project.application.custom.authentication.AuthenticationCredentials;
-import com.sakila.sakila_project.application.maps.MinimalDtoMapper;
+import com.sakila.sakila_project.application.maps.BaseDtoMapper;
 import com.sakila.sakila_project.application.maps.StaffDtoMapper;
 import com.sakila.sakila_project.application.usecases.ports.IAuthStaffUseCase;
+import com.sakila.sakila_project.application.usecases.ports.IGetStaffUseCase;
 import com.sakila.sakila_project.domain.exceptions.InvalidAuthenticationException;
 import com.sakila.sakila_project.domain.exceptions.InvalidCredentialsException;
 import com.sakila.sakila_project.domain.exceptions.TokenExpiredException;
 import com.sakila.sakila_project.domain.model.sakila.Staff;
 import com.sakila.sakila_project.domain.ports.output.repositories.sakila.StaffRepository;
 import io.jsonwebtoken.JwtException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,45 +22,40 @@ import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.function.Function;
 
+@Slf4j
 @RestController
 @RequestMapping("/staff")
 public class StaffController {
 
-    private final StaffRepository _repository;
-    private final MinimalDtoMapper _minimalDtoMapper;
-    private final StaffDtoMapper _staffDtoMapper;
+    private final IGetStaffUseCase _getStaffUseCase;
     private final IAuthStaffUseCase _authStaffUseCase;
 
 
     @Autowired
-    public StaffController(StaffRepository repository,
-                           MinimalDtoMapper minimalDtoMapper,
-                           StaffDtoMapper staffDtoMapper,
-                           IAuthStaffUseCase authStaffUseCase) {
-        _repository = repository;
-        _minimalDtoMapper = minimalDtoMapper;
-        _staffDtoMapper = staffDtoMapper;
+    public StaffController(IAuthStaffUseCase authStaffUseCase,
+                           IGetStaffUseCase getStaffUseCase) {
         _authStaffUseCase = authStaffUseCase;
+        _getStaffUseCase = getStaffUseCase;
     }
 
 
     @GetMapping("/getAllStaffs")
     public ResponseEntity<?> getAllStaffs(){
         try{
-            List<Staff> staffs = _repository.findAll();
-            var maps = _minimalDtoMapper.toMinStaffDtoList(staffs);
-            return ResponseEntity.status(HttpStatus.OK).body(maps);
+            var resp = _getStaffUseCase.AllWithBasicInfo();
+            return ResponseEntity.ok(resp);
         }
         catch(Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error, please try again later");
         }
     }
 
 
     @GetMapping("/getAllInfoById")
-    public ResponseEntity<?> getAllInfoByCredentials(){
+    public ResponseEntity<?> getAllInfo(){
         try{
 
             var auth = SecurityContextHolder.getContext().getAuthentication();
@@ -68,19 +65,16 @@ public class StaffController {
             }
 
             var id = ((AuthenticatedUser) auth.getPrincipal()).getId();
-            var staffOp = _repository.findById(id);
 
-            if(staffOp.isEmpty()){
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Staff not found");
-            }
-
-            var staff = staffOp.get();
-            var mapped = _staffDtoMapper.toDto(staff);
-            return ResponseEntity.status(HttpStatus.OK).body(mapped);
-
+            var resp = _getStaffUseCase.WithCompleteInfo(id);
+            return ResponseEntity.ok(resp);
+        }
+        catch (NoSuchElementException ex){
+            log.error(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The user are not exist");
         }
         catch(Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error, please try again later");
         }
     }
 

@@ -1,8 +1,8 @@
 package com.sakila.sakila_project.infrastructure.adapters.input.rest;
 
-import com.sakila.sakila_project.application.dto.MinActorDto;
+import com.sakila.sakila_project.application.dto.BaseActorDto;
 import com.sakila.sakila_project.application.maps.ActorDtoMapper;
-import com.sakila.sakila_project.application.maps.MinimalDtoMapper;
+import com.sakila.sakila_project.application.maps.BaseDtoMapper;
 import com.sakila.sakila_project.domain.ports.output.IEmailService;
 import com.sakila.sakila_project.domain.ports.output.repositories.sakila.ActorRepository;
 import com.sakila.sakila_project.domain.ports.output.repositories.sakila.FilmRepository;
@@ -32,13 +32,13 @@ public class ActorController {
 
     private final ActorRepository actorRepository;
     private final FilmRepository filmRepository;
-    private final MinimalDtoMapper minimalDtoMapper;
+    private final BaseDtoMapper minimalDtoMapper;
     private final ActorDtoMapper actorDtoMapper;
     private final IEmailService emailService;
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
-    public ActorController(ActorRepository actorRepository, MinimalDtoMapper minimalDtoMapper, ActorDtoMapper actorDtoMapper,
+    public ActorController(ActorRepository actorRepository, BaseDtoMapper minimalDtoMapper, ActorDtoMapper actorDtoMapper,
                            FilmRepository filmRepository, IEmailService emailService,
                            @Qualifier("primaryRedisTemplate") RedisTemplate<String, Object> redisTemplate) {
         this.actorRepository = actorRepository;
@@ -98,7 +98,7 @@ public class ActorController {
 
 
     @PostMapping("/auth/createActor")
-    public ResponseEntity<?> createActor(@RequestBody MinActorDto actor) {
+    public ResponseEntity<?> createActor(@RequestBody BaseActorDto actor) {
         try{
 
             var map = this.minimalDtoMapper.toActor(actor);
@@ -112,7 +112,7 @@ public class ActorController {
     }
 
     @PutMapping("/auth/updateActor")
-    public ResponseEntity<?> updateActor(@RequestBody MinActorDto actor,
+    public ResponseEntity<?> updateActor(@RequestBody BaseActorDto actor,
                                       @RequestParam int id) {
         try{
 
