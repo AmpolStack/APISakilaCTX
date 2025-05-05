@@ -23,8 +23,8 @@ public class DataSourcesConfiguration {
     @Primary
     @Bean("SakilaDS")
     public DataSource SKdataSource(
-            @Qualifier("SakilaDS_prop") DataSourceProperties dataSourcePropertie) {
-        return dataSourcePropertie.initializeDataSourceBuilder().build();
+            @Qualifier("SakilaDS_prop") DataSourceProperties dataSourceProperties) {
+        return dataSourceProperties.initializeDataSourceBuilder().build();
     }
 
 

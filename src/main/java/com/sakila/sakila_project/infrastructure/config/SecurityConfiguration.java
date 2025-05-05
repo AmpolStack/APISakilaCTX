@@ -36,6 +36,7 @@ public class SecurityConfiguration {
     public AuthenticationParams gauthenticationParams() {
         return new AuthenticationParams();
     }
+
     @Autowired
     public SecurityConfiguration(JwtSecurityFilter jwtSecurityFilter) {
         this.jwtSecurityFilter = jwtSecurityFilter;
