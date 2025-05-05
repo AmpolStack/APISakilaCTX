@@ -10,17 +10,18 @@ spring:
     tokens:
       url: jdbc:mysql://localhost:3307/jwt_db
       driver-class-name: com.mysql.cj.jdbc.Driver
-      dialect: org.hibernate.dialect.MySQLDialect
+#      dialect: org.hibernate.dialect.MySQLDialect
       ## username: your_database_username
       ## password: your_database_password
     sakila:
       url: jdbc:mariadb://localhost:3306/sakila
       driver-class-name: org.mariadb.jdbc.Driver
-      dialect: org.hibernate.dialect.MariaDBDialect
+#      dialect: org.hibernate.dialect.MariaDBDialect
       ## username: your_database_username
       ## password: your_database_password
   jpa:
     show-sql: true
+    open-in-view: false
   security:
     jwt:
       tokenExpiration: 60000
