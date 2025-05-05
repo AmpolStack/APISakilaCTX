@@ -1,7 +1,6 @@
 package com.sakila.sakila_project.infrastructure.config.Jpa;
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,8 +11,6 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 @Configuration
@@ -24,8 +21,6 @@ import java.util.Objects;
 )
 @EnableTransactionManagement
 public class SakilaJpa {
-    @Value("${spring.datasource.sakila.dialect}")
-    private String dialect;
 
     @Primary
     @Bean("SakilaEMF")
@@ -33,14 +28,10 @@ public class SakilaJpa {
             @Qualifier("SakilaDS") DataSource dataSource,
             EntityManagerFactoryBuilder builder
     ){
-        Map<String, Object> properties = new HashMap<>();
-        properties.put("hibernate.dialect", dialect);
-
         return builder
                 .dataSource(dataSource)
                 .persistenceUnit("sakilaDb")
                 .packages("com.sakila.sakila_project.domain.model.sakila")
-                .properties(properties)
                 .build();
     }
 

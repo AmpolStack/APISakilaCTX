@@ -1,7 +1,6 @@
 package com.sakila.sakila_project.infrastructure.config.Jpa;
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,8 +10,6 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 @Configuration
@@ -23,27 +20,22 @@ import java.util.Objects;
 )
 @EnableTransactionManagement
 public class TokensJpa {
-    @Value("${spring.datasource.tokens.dialect}")
-    private String dialect;
 
     @Bean("TokensEMF")
-    public LocalContainerEntityManagerFactoryBean TKManagerFactory(
+    public LocalContainerEntityManagerFactoryBean TKEntityManagerFactory(
             @Qualifier("TokensDS") DataSource dataSource,
             EntityManagerFactoryBuilder builder
             ) {
-        Map<String, Object> properties = new HashMap<>();
-        properties.put("hibernate.dialect", dialect);
 
         return builder
                 .dataSource(dataSource)
                 .persistenceUnit("tokensDb")
                 .packages("com.sakila.sakila_project.domain.model.tokens")
-                .properties(properties)
                 .build();
     }
 
     @Bean("TokensTM")
-    public JpaTransactionManager TKManager(
+    public JpaTransactionManager TKTransactionManager(
             @Qualifier("TokensEMF") LocalContainerEntityManagerFactoryBean emf
     ) {
         return new JpaTransactionManager(Objects.requireNonNull(emf.getObject(), "Tokens Manager factory are required"));
