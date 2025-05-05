@@ -3,15 +3,11 @@ package com.sakila.sakila_project.infrastructure.adapters.input.rest;
 import com.sakila.sakila_project.application.custom.authentication.AuthenticatedUser;
 import com.sakila.sakila_project.application.custom.authentication.AuthenticationBridge;
 import com.sakila.sakila_project.application.custom.authentication.AuthenticationCredentials;
-import com.sakila.sakila_project.application.maps.BaseDtoMapper;
-import com.sakila.sakila_project.application.maps.StaffDtoMapper;
 import com.sakila.sakila_project.application.usecases.ports.IAuthStaffUseCase;
 import com.sakila.sakila_project.application.usecases.ports.IGetStaffUseCase;
 import com.sakila.sakila_project.domain.exceptions.InvalidAuthenticationException;
 import com.sakila.sakila_project.domain.exceptions.InvalidCredentialsException;
 import com.sakila.sakila_project.domain.exceptions.TokenExpiredException;
-import com.sakila.sakila_project.domain.model.sakila.Staff;
-import com.sakila.sakila_project.domain.ports.output.repositories.sakila.StaffRepository;
 import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +17,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
 
