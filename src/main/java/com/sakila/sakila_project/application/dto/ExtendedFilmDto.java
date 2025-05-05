@@ -5,7 +5,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ExtStaffDto extends MinStaffDto{
-    private ExtStoreDto store;
-    private MinAddressDto address;
+public class ExtendedFilmDto extends BaseFilmDto {
+    private String language;
 }

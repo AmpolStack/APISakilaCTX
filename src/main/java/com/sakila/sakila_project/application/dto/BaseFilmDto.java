@@ -7,7 +7,7 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class MinFilmDto {
+public class BaseFilmDto {
     private String title;
     private String description;
     private int release_year;

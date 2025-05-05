@@ -7,7 +7,7 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class MinAddressDto {
+public class BaseAddressDto {
     private String address;
     private String address2;
     private String district;

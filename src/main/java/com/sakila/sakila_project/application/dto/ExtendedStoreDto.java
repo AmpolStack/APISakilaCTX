@@ -7,8 +7,8 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class MinActorDto {
-    private String first_name;
-    private String last_name;
+public class ExtendedStoreDto {
+    private int id;
+    private BaseAddressDto address;
     private Date last_update;
 }

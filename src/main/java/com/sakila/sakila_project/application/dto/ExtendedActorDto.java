@@ -7,6 +7,6 @@ import java.util.List;
 
 @Getter
 @Setter
-public class ExtActorDto extends MinActorDto {
-    private List<ExtFilmDto> films;
+public class ExtendedActorDto extends BaseActorDto {
+    private List<ExtendedFilmDto> films;
 }
