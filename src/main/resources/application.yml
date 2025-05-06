@@ -24,7 +24,8 @@ spring:
     open-in-view: false
   security:
     jwt:
-      tokenExpiration: 60000
+#      tokenExpiration: 60000
+      tokenExpiration: 360000
       ## secret: your_256_bits_string_secret
       refreshTokenExpiration: 180000
       latencyInMs: 5000
