@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -47,8 +46,7 @@ public class AuthStaffUseCase implements IAuthStaffUseCase {
                 || credentials.getPassword().isBlank()) {
             throw new InvalidCredentialsException("Invalid credentials");
         }
-
-        var staffOp = _staffRepository.findStaffByUsernameAndPassword(credentials.getUsername(), credentials.getPassword());
+        var staffOp = _staffRepository.findByUsernameAndPasswordWithAddress(credentials.getUsername(), credentials.getPassword());
         var staff = staffOp.orElseThrow(() -> new InvalidCredentialsException("No exist staff registered with this credentials"));
         return SaveRegistry(staff);
     }
@@ -57,7 +55,7 @@ public class AuthStaffUseCase implements IAuthStaffUseCase {
     public AuthenticationBridge Authenticate(AuthenticationBridge authenticationRequest) {
 
         Optional<TokenRegistration> registrationOp;
-        registrationOp = _tokenRegistrationRepository.findTokenRegistrationByTokenAndRefreshToken(
+        registrationOp = _tokenRegistrationRepository.findByTokenAndRefreshToken(
                     authenticationRequest.getToken(),
                     authenticationRequest.getRefreshToken());
 
@@ -67,7 +65,7 @@ public class AuthStaffUseCase implements IAuthStaffUseCase {
             throw new TokenExpiredException("Refresh Token has expired, please login again");
         }
 
-        var staffOp = _staffRepository.findById(registration.getIdUser());
+        var staffOp = _staffRepository.findByIdWithAddress(registration.getIdUser());
         var staff = staffOp.orElseThrow(()-> new InvalidAuthenticationException("No exist staff registered with this tokens"));
         return SaveRegistry(staff);
     }
