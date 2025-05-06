@@ -49,7 +49,7 @@ public class StaffController {
     }
 
 
-    @GetMapping("/getAllInfoById")
+    @GetMapping("/getByIdWithCompleteInfo")
     public ResponseEntity<?> getAllInfo(){
         try{
 
@@ -68,7 +68,12 @@ public class StaffController {
             log.error(ex.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The user are not exist");
         }
+        catch (IllegalStateException ex){
+            log.error(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error while accessing this resource serialized");
+        }
         catch(Exception e){
+            log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error, please try again later");
         }
     }

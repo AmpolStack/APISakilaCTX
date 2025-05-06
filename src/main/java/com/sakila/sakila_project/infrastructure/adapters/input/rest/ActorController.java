@@ -52,7 +52,7 @@ public class ActorController {
     @GetMapping("/getAllActorsInfo")
     public ResponseEntity<?> getAllActors() {
         try{
-            var actors = this.actorRepository.findActors();
+            var actors = this.actorRepository.findAll();
             var maps = this.minimalDtoMapper.toMinimalActorDtoList(actors);
             return ResponseEntity.ok(maps);
         }
@@ -64,7 +64,7 @@ public class ActorController {
     @GetMapping("/getActorById")
     public ResponseEntity<?> getActorAllInfo(@RequestParam int id) {
         try{
-            var actor = this.actorRepository.findById(id);
+            var actor = this.actorRepository.findByIdWithFilmsAndLanguage(id);
 
             if(actor.isEmpty()){
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Actor not found");
