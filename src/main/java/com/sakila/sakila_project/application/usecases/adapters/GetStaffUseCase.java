@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 @Service
 public class GetStaffUseCase implements IGetStaffUseCase {
@@ -37,32 +38,25 @@ public class GetStaffUseCase implements IGetStaffUseCase {
 
     @Override
     public ExtendedStaffDto WithCompleteInfo(int id) {
-        var staff = getStaff2(id);
-        return staff;
+        return getStaff(id, _staffDtoMapper::toDto, ExtendedStaffDto.class );
     }
 
     @Override
     public BaseStaffDto WithBasicInfo(int id) {
-        var staff = getStaff(id);
-        return staff;
+        return getStaff(id, _baseDtoMapper::toMinStaffDto, BaseStaffDto.class);
     }
 
-    private BaseStaffDto getStaff(int id){
+
+    private <T> T getStaff(int id, Function<Staff, T> mapFunction, Class<T> clazz){
+
         var inCache = _cacheService.Get(Integer.toString(id));
         var serializer = new ObjectMapper();
 
-        if(inCache!=null){
-
-            try {
-                return serializer.readValue(inCache, BaseStaffDto.class);
-            } catch (JsonProcessingException e) {
-                throw new IllegalStateException("Failed to deserialize staff", e);
-            }
-        }
-        else{
-            var staffOp = _staffRepository.findById(id);
-            var staff = staffOp.orElseThrow(() -> new NoSuchElementException("No staff found with this id"));
-            var map = _baseDtoMapper.toMinStaffDto(staff);
+        if(inCache==null){
+            var map = _staffRepository
+                    .findByIdWithStoreAndAddress(id)
+                    .map(mapFunction)
+                    .orElseThrow(NoSuchElementException::new);
             try {
                 var staffJson = serializer.writeValueAsString(map);
                 _cacheService.Set(Integer.toString(id), staffJson, 1, TimeUnit.MINUTES);
@@ -71,35 +65,13 @@ public class GetStaffUseCase implements IGetStaffUseCase {
             }
 
             return map;
-
         }
-    }
-
-    private ExtendedStaffDto getStaff2(int id){
-        var inCache = _cacheService.Get(Integer.toString(id));
-        var serializer = new ObjectMapper();
-
-        if(inCache!=null){
-
+        else{
             try {
-                return serializer.readValue(inCache, ExtendedStaffDto.class);
+                return serializer.readValue(inCache, clazz);
             } catch (JsonProcessingException e) {
                 throw new IllegalStateException("Failed to deserialize staff", e);
             }
-        }
-        else{
-            var staffOp = _staffRepository.findByIdWithStoreAndAddress(id);
-            var staff = staffOp.orElseThrow(() -> new NoSuchElementException("No staff found with this id"));
-            var map = _staffDtoMapper.toDto(staff);
-            try {
-                var staffJson = serializer.writeValueAsString(map);
-                _cacheService.Set(Integer.toString(id), staffJson, 1, TimeUnit.MINUTES);
-            } catch (JsonProcessingException e) {
-                throw new IllegalStateException("Failed to serialize staff", e);
-            }
-
-            return map;
-
         }
     }
 
