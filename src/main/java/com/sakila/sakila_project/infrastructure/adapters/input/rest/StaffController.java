@@ -89,6 +89,7 @@ public class StaffController {
 
             var resp = _mutableStaffUseCase.updateAddresses(dto, id);
             return ResponseEntity.ok(resp);
+
         }
         catch (NoSuchElementException ex){
             return ErrorResponse(ex, HttpStatus.NOT_FOUND);
@@ -101,8 +102,8 @@ public class StaffController {
         }
     }
 
-    @PatchMapping("/update")
-    public ResponseEntity<?> updateAddress(@RequestParam int storeId){
+    @PatchMapping("/updateAssignedStore")
+    public ResponseEntity<?> updateAssignedStore(@RequestParam int storeId){
         try{
             var auth = SecurityContextHolder.getContext().getAuthentication();
 

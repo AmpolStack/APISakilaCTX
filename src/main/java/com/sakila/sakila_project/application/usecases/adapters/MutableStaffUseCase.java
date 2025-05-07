@@ -30,16 +30,23 @@ public class MutableStaffUseCase implements IMutableStaffUseCase {
     }
 
 
+    //TODO: CHANGE THE LOGIC
     @Override
     @Transactional
     public BaseStaffDto updateAllStaffProperties(BaseStaffDto baseStaffDto, int staffId) {
 
-        if (!_staffRepository.existsById(staffId)){
-            throw new NoSuchElementException("Staff does not exist");
-        }
+        var staff = _staffRepository.findById(staffId)
+                .orElseThrow(NoSuchElementException::new);
 
-        var staff = _baseDtoMapper.toStaff(baseStaffDto);
-        staff.setId(staffId);
+        var staffMap = _baseDtoMapper.toStaff(baseStaffDto);
+
+        staff.setFirst_name(staffMap.getFirst_name());
+        staff.setLast_name(staffMap.getLast_name());
+        staff.setEmail(staffMap.getEmail());
+        staff.setPicture(staffMap.getPicture());
+        staff.setActive(staffMap.getActive());
+        staff.setUsername(staffMap.getUsername());
+        staff.setLast_update(staffMap.getLast_update());
 
         var resp = _staffRepository.save(staff);
 
@@ -47,6 +54,7 @@ public class MutableStaffUseCase implements IMutableStaffUseCase {
     }
 
 
+    //TODO: CHANGES THE LOGIC
     @Override
     @Transactional
     public ExtendedStaffDto updateAddresses(BaseAddressDto addressDto, int staffId) {
@@ -54,9 +62,15 @@ public class MutableStaffUseCase implements IMutableStaffUseCase {
         var staff = _staffRepository.findByIdWithAddress(staffId)
                 .orElseThrow(() -> new NoSuchElementException("Staff does not exist"));
 
+        var addressOp = staff.getAddress();
         var address = _baseDtoMapper.toAddress(addressDto);
 
-        address.setId(staff.getAddress().getId());
+        addressOp.setAddress(address.getAddress());
+        addressOp.setAddress2(address.getAddress2());
+        addressOp.setDistrict(address.getDistrict());
+        addressOp.setPostal_code(address.getPostal_code());
+        addressOp.setLast_update(address.getLast_update());
+        addressOp.setPhone(address.getPhone());
 
         var resp = _staffRepository.save(staff);
 
