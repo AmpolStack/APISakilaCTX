@@ -19,14 +19,14 @@ public class Staff {
     private String first_name;
     @Column(length = 45)
     private String last_name;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     @JoinColumn(name = "address_id")
     private Address address;
     private byte[] picture;
     @Column(length = 50)
     private String email;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id")
+    @JoinColumn(name = "store_id", nullable = true)
     private Store store;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "staff")
     private List<Payment> payments;
