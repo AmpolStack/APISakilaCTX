@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface TokenRegistrationRepository extends JpaRepository<TokenRegistration, Integer>{
-    Optional<TokenRegistration> findTokenRegistrationByTokenAndRefreshToken(String token, String refreshToken);
+    Optional<TokenRegistration> findByTokenAndRefreshToken(String token, String refreshToken);
 }
