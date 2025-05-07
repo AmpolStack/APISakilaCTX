@@ -3,8 +3,11 @@ package com.sakila.sakila_project.infrastructure.adapters.input.rest;
 import com.sakila.sakila_project.application.custom.authentication.AuthenticatedUser;
 import com.sakila.sakila_project.application.custom.authentication.AuthenticationBridge;
 import com.sakila.sakila_project.application.custom.authentication.AuthenticationCredentials;
+import com.sakila.sakila_project.application.dto.BaseAddressDto;
+import com.sakila.sakila_project.application.dto.BaseStaffDto;
 import com.sakila.sakila_project.application.usecases.ports.IAuthStaffUseCase;
 import com.sakila.sakila_project.application.usecases.ports.IGetStaffUseCase;
+import com.sakila.sakila_project.application.usecases.ports.IMutableStaffUseCase;
 import com.sakila.sakila_project.domain.exceptions.InvalidAuthenticationException;
 import com.sakila.sakila_project.domain.exceptions.InvalidCredentialsException;
 import com.sakila.sakila_project.domain.exceptions.TokenExpiredException;
@@ -27,13 +30,15 @@ public class StaffController {
 
     private final IGetStaffUseCase _getStaffUseCase;
     private final IAuthStaffUseCase _authStaffUseCase;
-
+    private final IMutableStaffUseCase _mutableStaffUseCase;
 
     @Autowired
     public StaffController(IAuthStaffUseCase authStaffUseCase,
-                           IGetStaffUseCase getStaffUseCase) {
+                           IGetStaffUseCase getStaffUseCase,
+                           IMutableStaffUseCase mutableStaffUseCase) {
         _authStaffUseCase = authStaffUseCase;
         _getStaffUseCase = getStaffUseCase;
+        _mutableStaffUseCase = mutableStaffUseCase;
     }
 
 
@@ -43,11 +48,83 @@ public class StaffController {
             var resp = _getStaffUseCase.AllWithBasicInfo();
             return ResponseEntity.ok(resp);
         }
-        catch(Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error, please try again later");
+        catch(Exception ex){
+            return ErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
+    @PutMapping("/updateAllBaseProperties")
+    public ResponseEntity<?> updateAllProperties(@RequestBody BaseStaffDto dto){
+        try{
+            var auth = SecurityContextHolder.getContext().getAuthentication();
+
+            if(!(auth.getPrincipal() instanceof AuthenticatedUser)){
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This user not have permission to access this resource");
+            }
+            var id = ((AuthenticatedUser) auth.getPrincipal()).getId();
+
+            var resp = _mutableStaffUseCase.updateAllStaffProperties(dto, id);
+            return ResponseEntity.ok(resp);
+        }
+        catch (NoSuchElementException ex){
+            return ErrorResponse(ex, HttpStatus.NOT_FOUND);
+        }
+        catch (IllegalStateException ex){
+            return ErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        catch(Exception e){
+            return ErrorResponse(e, HttpStatus.SERVICE_UNAVAILABLE);
+        }
+    }
+
+    @PatchMapping("/updateAddress")
+    public ResponseEntity<?> updateAddress(@RequestBody BaseAddressDto dto){
+        try{
+            var auth = SecurityContextHolder.getContext().getAuthentication();
+
+            if(!(auth.getPrincipal() instanceof AuthenticatedUser)){
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This user not have permission to access this resource");
+            }
+            var id = ((AuthenticatedUser) auth.getPrincipal()).getId();
+
+            var resp = _mutableStaffUseCase.updateAddresses(dto, id);
+            return ResponseEntity.ok(resp);
+        }
+        catch (NoSuchElementException ex){
+            return ErrorResponse(ex, HttpStatus.NOT_FOUND);
+        }
+        catch (IllegalStateException ex){
+            return ErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        catch(Exception e){
+            return ErrorResponse(e, HttpStatus.SERVICE_UNAVAILABLE);
+        }
+    }
+
+    @PatchMapping("/update")
+    public ResponseEntity<?> updateAddress(@RequestParam int storeId){
+        try{
+            var auth = SecurityContextHolder.getContext().getAuthentication();
+
+            if(!(auth.getPrincipal() instanceof AuthenticatedUser)){
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This user not have permission to access this resource");
+            }
+            var id = ((AuthenticatedUser) auth.getPrincipal()).getId();
+
+            _mutableStaffUseCase.updateAssignedStore(storeId, id);
+
+            return ResponseEntity.ok("Successfully updated");
+        }
+        catch (NoSuchElementException ex){
+            return ErrorResponse(ex, HttpStatus.NOT_FOUND);
+        }
+        catch (IllegalStateException ex){
+            return ErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        catch(Exception e){
+            return ErrorResponse(e, HttpStatus.SERVICE_UNAVAILABLE);
+        }
+    }
 
     @GetMapping("/getByIdWithCompleteInfo")
     public ResponseEntity<?> getAllInfo(){
@@ -58,23 +135,19 @@ public class StaffController {
             if(!(auth.getPrincipal() instanceof AuthenticatedUser)){
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This user not have permission to access this resource");
             }
-
             var id = ((AuthenticatedUser) auth.getPrincipal()).getId();
 
             var resp = _getStaffUseCase.WithCompleteInfo(id);
             return ResponseEntity.ok(resp);
         }
         catch (NoSuchElementException ex){
-            log.error(ex.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The user are not exist");
+            return ErrorResponse(ex, HttpStatus.NOT_FOUND);
         }
         catch (IllegalStateException ex){
-            log.error(ex.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error while accessing this resource serialized");
+            return ErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         catch(Exception e){
-            log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error, please try again later");
+            return ErrorResponse(e, HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -88,27 +161,36 @@ public class StaffController {
         return GeneralizedAuthentication(x -> x.Authenticate(authenticationRequest));
     }
 
+    @GetMapping("/open/getCsrfToken")
+    public ResponseEntity<?> getCsrfToken(CsrfToken csrfToken){
+        try{
+            return ResponseEntity.status(HttpStatus.OK).body(csrfToken);
+        }
+        catch(Exception ex){
+            return ErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
     private ResponseEntity<?> GeneralizedAuthentication(Function<IAuthStaffUseCase, AuthenticationBridge> function){
         try{
             var action = function.apply(_authStaffUseCase);
             return ResponseEntity.status(HttpStatus.OK).body(action);
         }
-        catch (InvalidCredentialsException ex){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        catch (InvalidCredentialsException | JwtException ex){
+            return ErrorResponse(ex, HttpStatus.BAD_REQUEST);
         }
         catch (InvalidAuthenticationException | TokenExpiredException ex){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
-        }
-        catch (JwtException ex){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+            return ErrorResponse(ex, HttpStatus.UNAUTHORIZED);
         }
         catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(ex.getMessage());
+            return ErrorResponse(ex, HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
-    @GetMapping("/open/getCsrfToken")
-    public ResponseEntity<?> getCsrfToken(CsrfToken csrfToken){
-        return ResponseEntity.status(HttpStatus.OK).body(csrfToken);
+
+    private static ResponseEntity<?> ErrorResponse(Exception exception, HttpStatus status){
+        log.error(exception.getMessage());
+        return ResponseEntity.status(status).body(exception.getMessage());
     }
 }
