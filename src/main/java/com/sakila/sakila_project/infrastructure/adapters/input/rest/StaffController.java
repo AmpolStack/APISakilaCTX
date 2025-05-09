@@ -8,12 +8,14 @@ import com.sakila.sakila_project.application.dto.BaseStaffDto;
 import com.sakila.sakila_project.application.usecases.ports.IAuthStaffUseCase;
 import com.sakila.sakila_project.application.usecases.ports.IGetStaffUseCase;
 import com.sakila.sakila_project.application.usecases.ports.IMutableStaffUseCase;
+import com.sakila.sakila_project.application.usecases.ports.IPasswordUseCase;
 import com.sakila.sakila_project.domain.exceptions.InvalidAuthenticationException;
 import com.sakila.sakila_project.domain.exceptions.InvalidCredentialsException;
 import com.sakila.sakila_project.domain.exceptions.TokenExpiredException;
 import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,16 +33,59 @@ public class StaffController {
     private final IGetStaffUseCase _getStaffUseCase;
     private final IAuthStaffUseCase _authStaffUseCase;
     private final IMutableStaffUseCase _mutableStaffUseCase;
+    private final IPasswordUseCase _passwordUseCase;
+
+    @Value("${spring.email.username}")
+    private String _emailFrom;
 
     @Autowired
     public StaffController(IAuthStaffUseCase authStaffUseCase,
                            IGetStaffUseCase getStaffUseCase,
-                           IMutableStaffUseCase mutableStaffUseCase) {
+                           IMutableStaffUseCase mutableStaffUseCase,
+                           IPasswordUseCase passwordUseCase) {
         _authStaffUseCase = authStaffUseCase;
         _getStaffUseCase = getStaffUseCase;
         _mutableStaffUseCase = mutableStaffUseCase;
+        _passwordUseCase = passwordUseCase;
     }
 
+    @GetMapping("/requestPasswordUpdate")
+    public ResponseEntity<?> requestPasswordUpdate(@RequestParam String newPassword) {
+        try{
+            var auth = SecurityContextHolder.getContext().getAuthentication();
+
+            if(!(auth.getPrincipal() instanceof AuthenticatedUser)){
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This user not have permission to access this resource");
+            }
+            var id = ((AuthenticatedUser) auth.getPrincipal()).getId();
+
+            var resp = _passwordUseCase.SendRequestForUpdatePassword(id, newPassword, _emailFrom);
+            return ResponseEntity.ok(resp);
+        }
+        catch(Exception ex){
+            log.error(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+    @PatchMapping("UpdatePasswordByCorrelationId")
+    public ResponseEntity<?> updatePasswordByCorrelationId(@RequestParam String correlationId){
+        try{
+
+            var auth = SecurityContextHolder.getContext().getAuthentication();
+
+            if(!(auth.getPrincipal() instanceof AuthenticatedUser)){
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This user not have permission to access this resource");
+            }
+            var id = ((AuthenticatedUser) auth.getPrincipal()).getId();
+            _passwordUseCase.UpdatePassword(id, correlationId);
+            return ResponseEntity.ok("Successfully Updated");
+        }
+        catch(Exception ex){
+            log.error(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
 
     @GetMapping("/getAllStaffs")
     public ResponseEntity<?> getAllStaffs(){
