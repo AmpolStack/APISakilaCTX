@@ -1,9 +1,8 @@
 package com.sakila.sakila_project.application.usecases.ports;
 
-import com.sakila.sakila_project.application.custom.authentication.AuthenticationCredentials;
+import jakarta.mail.MessagingException;
 
-public interface ICredentialsUseCase {
-    public String SendCorrelationId(String oldPassword, String email);
-    public String UpdateCredentials(String newPassword);
-    public void CheckCorrelationalId(int id, String correlationalId);
+public interface IPasswordUseCase {
+    String SendRequestForUpdatePassword(int id, String newPassword, String fromAddress) throws MessagingException;
+    void UpdatePassword(int id, String correlationalId);
 }
