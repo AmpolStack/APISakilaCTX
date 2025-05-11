@@ -1,9 +1,9 @@
 package com.sakila.sakila_project.infrastructure.adapters.output;
 
 import com.sakila.sakila_project.domain.ports.output.IEmailService;
+import com.sakila.sakila_project.domain.results.Result;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
@@ -28,7 +28,6 @@ public class EmailService implements IEmailService {
         helper.setTo(recipientMail);
         helper.setSubject(subject);
         helper.setText(body, true); // true = isHtml
-
         _emailSender.send(message);
     }
 
