@@ -21,20 +21,20 @@ import java.util.Optional;
 @Service
 public class AuthStaffUseCase implements IAuthStaffUseCase {
 
-    private final AuthenticationParams _authenticationParams;
-    private final TokenRegistrationRepository _tokenRegistrationRepository;
-    private final IJwtService _jwtService;
-    private final StaffRepository _staffRepository;
+    private final AuthenticationParams authenticationParams;
+    private final TokenRegistrationRepository tokenRegistrationRepository;
+    private final IJwtService jwtService;
+    private final StaffRepository staffRepository;
 
     @Autowired
     public AuthStaffUseCase(IJwtService jwtService,
                             TokenRegistrationRepository tokenRegistrationRepository,
                             StaffRepository staffRepository,
                             AuthenticationParams authenticationParams) {
-        _jwtService = jwtService;
-        _tokenRegistrationRepository = tokenRegistrationRepository;
-        _staffRepository = staffRepository;
-        _authenticationParams = authenticationParams;
+        this.jwtService = jwtService;
+        this.tokenRegistrationRepository = tokenRegistrationRepository;
+        this.staffRepository = staffRepository;
+        this.authenticationParams = authenticationParams;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class AuthStaffUseCase implements IAuthStaffUseCase {
             return Result.Failed(new Error("username and password are required", ErrorType.VALIDATION_ERROR));
         }
 
-        var staffOp = _staffRepository.findByUsernameAndPasswordWithAddress(credentials.getUsername(), credentials.getPassword());
+        var staffOp = this.staffRepository.findByUsernameAndPasswordWithAddress(credentials.getUsername(), credentials.getPassword());
         var staff = staffOp.orElse(null);
         if(staff == null) {
             return Result.Failed(new Error("No exist staff with this credentials", ErrorType.NOT_FOUND_ERROR));
@@ -59,7 +59,7 @@ public class AuthStaffUseCase implements IAuthStaffUseCase {
     public Result<AuthenticationBridge> Authenticate(AuthenticationBridge authenticationRequest) {
 
         Optional<TokenRegistration> registrationOp;
-        registrationOp = _tokenRegistrationRepository.findByTokenAndRefreshToken(
+        registrationOp = this.tokenRegistrationRepository.findByTokenAndRefreshToken(
                     authenticationRequest.getToken(),
                     authenticationRequest.getRefreshToken());
 
@@ -73,7 +73,7 @@ public class AuthStaffUseCase implements IAuthStaffUseCase {
             return Result.Failed(new Error("Refresh Token has expired, please login again", ErrorType.VALIDATION_ERROR));
         }
 
-        var staffOp = _staffRepository.findByIdWithAddress(registration.getIdUser());
+        var staffOp = this.staffRepository.findByIdWithAddress(registration.getIdUser());
         var staff = staffOp.orElse(null);
 
         if(staff == null) {
@@ -85,10 +85,10 @@ public class AuthStaffUseCase implements IAuthStaffUseCase {
 
     @Override
     public Result<AuthenticatedUserMetadata> GetMetadata(String token) {
-        var claimsResult = this._jwtService.GetAllClaims(token, _authenticationParams.getSecret());
+        var claimsResult = this.jwtService.GetAllClaims(token, this.authenticationParams.getSecret());
 
         if(!claimsResult.isSuccess()){
-            return Result.Failed(claimsResult.getError());
+            return Result.Failed(claimsResult);
         }
 
         var claims = claimsResult.getData();
@@ -104,14 +104,14 @@ public class AuthStaffUseCase implements IAuthStaffUseCase {
     private Result<AuthenticationBridge> SaveRegistry(Staff staff) {
 
         var claims = StaffEntityToClaimsMap(staff);
-        var tokenResult = _jwtService.GenerateToken(claims, _authenticationParams.getTokenExpiration(), _authenticationParams.getSecret());
+        var tokenResult = this.jwtService.GenerateToken(claims, this.authenticationParams.getTokenExpiration(), this.authenticationParams.getSecret());
 
         if(!tokenResult.isSuccess()){
-            return Result.Failed(tokenResult.getError());
+            return Result.Failed(tokenResult);
         }
 
         var token = tokenResult.getData();
-        var refreshToken = _jwtService.GenerateRefreshToken();
+        var refreshToken = this.jwtService.GenerateRefreshToken();
 
         var tokenRegistration = new TokenRegistration();
         tokenRegistration.setToken(token);
@@ -119,9 +119,9 @@ public class AuthStaffUseCase implements IAuthStaffUseCase {
         tokenRegistration.setActive(true);
         tokenRegistration.setIdUser(staff.getId());
         tokenRegistration.setCreationDate(new Date());
-        tokenRegistration.setExpirationDate(new Date(new Date().getTime() + _authenticationParams.getRefreshTokenExpiration() + _authenticationParams.getLatencyInMs()));
+        tokenRegistration.setExpirationDate(new Date(new Date().getTime() + this.authenticationParams.getRefreshTokenExpiration() + this.authenticationParams.getLatencyInMs()));
 
-        _tokenRegistrationRepository.save(tokenRegistration);
+        this.tokenRegistrationRepository.save(tokenRegistration);
 
         return Result.Success(new AuthenticationBridge(token, refreshToken));
     }

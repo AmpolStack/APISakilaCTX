@@ -17,17 +17,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class MutableStaffUseCase implements IMutableStaffUseCase {
 
-    private final StaffRepository _staffRepository;
-    private final BaseDtoMapper _baseDtoMapper;
-    private final StaffDtoMapper _staffDtoMapper;
+    private final StaffRepository staffRepository;
+    private final BaseDtoMapper baseDtoMapper;
+    private final StaffDtoMapper staffDtoMapper;
 
     @Autowired
     public MutableStaffUseCase(StaffRepository staffRepository,
                                BaseDtoMapper baseDtoMapper,
                                StaffDtoMapper staffDtoMapper) {
-        _staffRepository = staffRepository;
-        _baseDtoMapper = baseDtoMapper;
-        _staffDtoMapper = staffDtoMapper;
+        this.staffRepository = staffRepository;
+        this.baseDtoMapper = baseDtoMapper;
+        this.staffDtoMapper = staffDtoMapper;
     }
 
 
@@ -36,14 +36,14 @@ public class MutableStaffUseCase implements IMutableStaffUseCase {
     @Transactional
     public Result<BaseStaffDto> updateAllStaffProperties(BaseStaffDto baseStaffDto, int staffId) {
 
-        var staff = _staffRepository.findById(staffId)
+        var staff = this.staffRepository.findById(staffId)
                 .orElse(null);
 
         if (staff == null) {
             return Result.Failed(new Error("No exist staff with this id", ErrorType.NOT_FOUND_ERROR));
         }
 
-        var staffMap = _baseDtoMapper.toStaff(baseStaffDto);
+        var staffMap = this.baseDtoMapper.toStaff(baseStaffDto);
 
         staff.setFirst_name(staffMap.getFirst_name());
         staff.setLast_name(staffMap.getLast_name());
@@ -59,9 +59,9 @@ public class MutableStaffUseCase implements IMutableStaffUseCase {
             return Result.Failed(verify.getError());
         }
 
-        var resp = _staffRepository.save(staff);
+        var resp = this.staffRepository.save(staff);
 
-        return Result.Success(_baseDtoMapper.toMinStaffDto(resp));
+        return Result.Success(this.baseDtoMapper.toMinStaffDto(resp));
     }
 
 
@@ -70,7 +70,7 @@ public class MutableStaffUseCase implements IMutableStaffUseCase {
     @Transactional
     public Result<ExtendedStaffDto> updateAddresses(BaseAddressDto addressDto, int staffId) {
 
-        var staff = _staffRepository.findByIdWithAddress(staffId)
+        var staff = this.staffRepository.findByIdWithAddress(staffId)
                 .orElse(null);
 
         if (staff == null) {
@@ -80,10 +80,10 @@ public class MutableStaffUseCase implements IMutableStaffUseCase {
         var addressResp = staff.getAddress();
 
         if(!addressResp.Verify().isSuccess()){
-            return Result.Failed(addressResp.Verify().getError());
+            return Result.Failed(addressResp.Verify());
         }
 
-        var address = _baseDtoMapper.toAddress(addressDto);
+        var address = this.baseDtoMapper.toAddress(addressDto);
 
         addressResp.setAddress(address.getAddress());
         addressResp.setAddress2(address.getAddress2());
@@ -92,14 +92,14 @@ public class MutableStaffUseCase implements IMutableStaffUseCase {
         addressResp.setLast_update(address.getLast_update());
         addressResp.setPhone(address.getPhone());
 
-        var resp = _staffRepository.save(staff);
+        var resp = this.staffRepository.save(staff);
 
-        return Result.Success(_staffDtoMapper.toDto(resp));
+        return Result.Success(this.staffDtoMapper.toDto(resp));
     }
 
     @Override
     public Result<Void> updateAssignedStore(int storeId, int staffId) {
-        var staff = _staffRepository.findByIdWithStoreAndAddress(staffId)
+        var staff = this.staffRepository.findByIdWithStoreAndAddress(staffId)
         .orElse(null);
 
         if (staff == null) {
@@ -107,7 +107,7 @@ public class MutableStaffUseCase implements IMutableStaffUseCase {
         }
 
         staff.getStore().setId(storeId);
-        _staffRepository.save(staff);
+        this.staffRepository.save(staff);
         return Result.Success();
     }
 

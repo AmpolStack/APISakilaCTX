@@ -22,45 +22,45 @@ import java.util.function.Function;
 @Service
 public class GetStaffUseCase implements IGetStaffUseCase {
 
-    private final StaffRepository _staffRepository;
-    private final BaseDtoMapper _baseDtoMapper;
-    private final StaffDtoMapper _staffDtoMapper;
-    private final ICacheService _cacheService;
+    private final StaffRepository staffRepository;
+    private final BaseDtoMapper baseDtoMapper;
+    private final StaffDtoMapper staffDtoMapper;
+    private final ICacheService cacheService;
 
     public GetStaffUseCase(StaffRepository staffRepository,
                            BaseDtoMapper baseDtoMapper,
                            StaffDtoMapper staffDtoMapper,
                            ICacheService cacheService) {
-        _staffRepository = staffRepository;
-        _baseDtoMapper = baseDtoMapper;
-        _staffDtoMapper = staffDtoMapper;
-        _cacheService = cacheService;
+        this.staffRepository = staffRepository;
+        this.baseDtoMapper = baseDtoMapper;
+        this.staffDtoMapper = staffDtoMapper;
+        this.cacheService = cacheService;
     }
 
 
     @Override
     public Result<ExtendedStaffDto> WithCompleteInfo(int id) {
-        return getStaff(id, _staffDtoMapper::toDto, ExtendedStaffDto.class );
+        return getStaff(id, this.staffDtoMapper::toDto, ExtendedStaffDto.class );
     }
 
     @Override
     public Result<BaseStaffDto> WithBasicInfo(int id) {
-        return getStaff(id, _baseDtoMapper::toMinStaffDto, BaseStaffDto.class);
+        return getStaff(id, this.baseDtoMapper::toMinStaffDto, BaseStaffDto.class);
     }
 
 
     private <T> Result<T> getStaff(int id, Function<Staff, T> mapFunction, Class<T> clazz){
 
-        var inCacheResult = _cacheService.Get(Integer.toString(id));
-        if(!inCacheResult.isSuccess()){
-            return Result.Failed(inCacheResult.getError());
+        var getCacheResult = this.cacheService.Get(Integer.toString(id));
+        if(!getCacheResult.isSuccess()){
+            return Result.Failed(getCacheResult);
         }
 
-        var inCache = inCacheResult.getData();
+        var inCache = getCacheResult.getData();
         var serializer = new ObjectMapper();
 
         if(inCache==null){
-            var map = _staffRepository
+            var map = this.staffRepository
                     .findByIdWithStoreAndAddress(id)
                     .map(mapFunction)
                     .orElse(null);
@@ -77,10 +77,10 @@ public class GetStaffUseCase implements IGetStaffUseCase {
                 return Result.Failed(new Error("Failed to serialize staff", ErrorType.OPERATION_ERROR));
             }
 
-            var setCacheResp = _cacheService.Set(Integer.toString(id), staffJson, 1, TimeUnit.MINUTES);
+            var setCacheResult = this.cacheService.Set(Integer.toString(id), staffJson, 1, TimeUnit.MINUTES);
 
-            if(!setCacheResp.isSuccess()){
-                return Result.Failed(setCacheResp.getError());
+            if(!setCacheResult.isSuccess()){
+                return Result.Failed(setCacheResult);
             }
 
             return Result.Success(map);
@@ -100,16 +100,16 @@ public class GetStaffUseCase implements IGetStaffUseCase {
     @Override
     public Result<List<BaseStaffDto>> AllWithBasicInfo() {
         var staffList = getStaffList();
-        return Result.Success(_baseDtoMapper.toMinStaffDtoList(staffList));
+        return Result.Success(this.baseDtoMapper.toMinStaffDtoList(staffList));
     }
 
     @Override
     public Result<List<ExtendedStaffDto>> AllWithCompleteInfo() {
         var staffList = getStaffList();
-        return Result.Success(_staffDtoMapper.toListDto(staffList));
+        return Result.Success(this.staffDtoMapper.toListDto(staffList));
     }
 
     private List<Staff> getStaffList(){
-        return _staffRepository.findAll();
+        return this.staffRepository.findAll();
     }
 }

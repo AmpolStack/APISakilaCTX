@@ -14,16 +14,16 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class PasswordUseCase implements IPasswordUseCase {
 
-    private final StaffRepository _staffRepository;
-    private final ICacheService _cacheService;
-    private final IEmailService _emailService;
+    private final StaffRepository staffRepository;
+    private final ICacheService cacheService;
+    private final IEmailService emailService;
 
     public PasswordUseCase(StaffRepository staffRepository,
                            ICacheService cacheService,
                            IEmailService emailService) {
-        _staffRepository = staffRepository;
-        _cacheService = cacheService;
-        _emailService = emailService;
+        this.staffRepository = staffRepository;
+        this.cacheService = cacheService;
+        this.emailService = emailService;
     }
 
     @Override
@@ -33,7 +33,7 @@ public class PasswordUseCase implements IPasswordUseCase {
             return Result.Failed(new Error("The new password are required", ErrorType.VALIDATION_ERROR));
         }
 
-        var staff = _staffRepository
+        var staff = this.staffRepository
                 .findById(id)
                 .orElse(null);
 
@@ -44,7 +44,7 @@ public class PasswordUseCase implements IPasswordUseCase {
         var correlationId = generateRandomCode();
         var cacheExp = 5;
 
-        var cacheResp = _cacheService.Set(correlationId, newPassword, cacheExp, TimeUnit.MINUTES);
+        var cacheResp = this.cacheService.Set(correlationId, newPassword, cacheExp, TimeUnit.MINUTES);
         if(!cacheResp.isSuccess()) {
             return Result.Failed(cacheResp.getError());
         }
@@ -62,7 +62,7 @@ public class PasswordUseCase implements IPasswordUseCase {
                 + "⏳ Code valid for " + cacheExp + " minutes</p>"
                 + "</body></html>";
 
-        var emailResp =_emailService
+        var emailResp =this.emailService
                 .SendEmail(subject,
                         body,
                         fromAddress,
@@ -82,12 +82,12 @@ public class PasswordUseCase implements IPasswordUseCase {
             return Result.Failed(new Error("The correlational id is required", ErrorType.VALIDATION_ERROR));
         }
 
-        var resultCache = _cacheService.Get(correlationalId);
+        var resultCache = this.cacheService.Get(correlationalId);
         if(!resultCache.isSuccess()){
             return Result.Failed(resultCache.getError());
         }
 
-        var staff = _staffRepository
+        var staff = this.staffRepository
                 .findById(id)
                 .orElse(null);
 
@@ -96,7 +96,7 @@ public class PasswordUseCase implements IPasswordUseCase {
         }
 
         staff.setPassword(resultCache.getData());
-        _staffRepository.save(staff);
+        this.staffRepository.save(staff);
         return Result.Success();
     }
 

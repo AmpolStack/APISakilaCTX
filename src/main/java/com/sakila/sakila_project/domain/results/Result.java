@@ -29,6 +29,10 @@ public class Result<T> extends ResultBase {
         return new Result<>(error);
     }
 
+    public static <T> Result<T> Failed(Result<?> result) {
+        return new Result<>(result.getError());
+    }
+
     public static <T> Result<T> Success() {
         return new Result<>();
     }
