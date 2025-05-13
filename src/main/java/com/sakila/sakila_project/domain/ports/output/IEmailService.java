@@ -1,10 +1,9 @@
 package com.sakila.sakila_project.domain.ports.output;
 
-import jakarta.mail.MessagingException;
-
+import com.sakila.sakila_project.domain.results.Result;
 import java.io.InputStream;
 
 public interface IEmailService {
-    void SendEmail(String subject, String body, String senderMail, String recipientMail) throws MessagingException;
-    void SendEmail(String subject, String body, String senderMail, String recipientMail, InputStream file);
+    Result<Void> SendEmail(String subject, String body, String senderMail, String recipientMail);
+    Result<Void> SendEmail(String subject, String body, String senderMail, String recipientMail, InputStream file);
 }
