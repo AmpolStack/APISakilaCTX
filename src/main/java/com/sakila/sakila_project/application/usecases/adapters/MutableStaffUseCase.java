@@ -7,11 +7,12 @@ import com.sakila.sakila_project.application.maps.BaseDtoMapper;
 import com.sakila.sakila_project.application.maps.StaffDtoMapper;
 import com.sakila.sakila_project.application.usecases.ports.IMutableStaffUseCase;
 import com.sakila.sakila_project.domain.ports.output.repositories.sakila.StaffRepository;
+import com.sakila.sakila_project.domain.results.Error;
+import com.sakila.sakila_project.domain.results.ErrorType;
+import com.sakila.sakila_project.domain.results.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.NoSuchElementException;
 
 @Service
 public class MutableStaffUseCase implements IMutableStaffUseCase {
@@ -33,10 +34,14 @@ public class MutableStaffUseCase implements IMutableStaffUseCase {
     //TODO: CHANGE THE LOGIC
     @Override
     @Transactional
-    public BaseStaffDto updateAllStaffProperties(BaseStaffDto baseStaffDto, int staffId) {
+    public Result<BaseStaffDto> updateAllStaffProperties(BaseStaffDto baseStaffDto, int staffId) {
 
         var staff = _staffRepository.findById(staffId)
-                .orElseThrow(NoSuchElementException::new);
+                .orElse(null);
+
+        if (staff == null) {
+            return Result.Failed(new Error("No exist staff with this id", ErrorType.NOT_FOUND_ERROR));
+        }
 
         var staffMap = _baseDtoMapper.toStaff(baseStaffDto);
 
@@ -48,42 +53,62 @@ public class MutableStaffUseCase implements IMutableStaffUseCase {
         staff.setUsername(staffMap.getUsername());
         staff.setLast_update(staffMap.getLast_update());
 
+        var verify = staff.Verify();
+
+        if(!verify.isSuccess()){
+            return Result.Failed(verify.getError());
+        }
+
         var resp = _staffRepository.save(staff);
 
-        return _baseDtoMapper.toMinStaffDto(resp);
+        return Result.Success(_baseDtoMapper.toMinStaffDto(resp));
     }
 
 
     //TODO: CHANGES THE LOGIC
     @Override
     @Transactional
-    public ExtendedStaffDto updateAddresses(BaseAddressDto addressDto, int staffId) {
+    public Result<ExtendedStaffDto> updateAddresses(BaseAddressDto addressDto, int staffId) {
 
         var staff = _staffRepository.findByIdWithAddress(staffId)
-                .orElseThrow(() -> new NoSuchElementException("Staff does not exist"));
+                .orElse(null);
 
-        var addressOp = staff.getAddress();
+        if (staff == null) {
+            return Result.Failed(new Error("No exist staff with this id", ErrorType.NOT_FOUND_ERROR));
+        }
+
+        var addressResp = staff.getAddress();
+
+        if(!addressResp.Verify().isSuccess()){
+            return Result.Failed(addressResp.Verify().getError());
+        }
+
         var address = _baseDtoMapper.toAddress(addressDto);
 
-        addressOp.setAddress(address.getAddress());
-        addressOp.setAddress2(address.getAddress2());
-        addressOp.setDistrict(address.getDistrict());
-        addressOp.setPostal_code(address.getPostal_code());
-        addressOp.setLast_update(address.getLast_update());
-        addressOp.setPhone(address.getPhone());
+        addressResp.setAddress(address.getAddress());
+        addressResp.setAddress2(address.getAddress2());
+        addressResp.setDistrict(address.getDistrict());
+        addressResp.setPostal_code(address.getPostal_code());
+        addressResp.setLast_update(address.getLast_update());
+        addressResp.setPhone(address.getPhone());
 
         var resp = _staffRepository.save(staff);
 
-        return _staffDtoMapper.toDto(resp);
+        return Result.Success(_staffDtoMapper.toDto(resp));
     }
 
     @Override
-    public void updateAssignedStore(int storeId, int staffId) {
+    public Result<Void> updateAssignedStore(int storeId, int staffId) {
         var staff = _staffRepository.findByIdWithStoreAndAddress(staffId)
-        .orElseThrow(() -> new NoSuchElementException("Staff does not exist"));
+        .orElse(null);
+
+        if (staff == null) {
+            return Result.Failed(new Error("No exist staff with this id", ErrorType.NOT_FOUND_ERROR));
+        }
 
         staff.getStore().setId(storeId);
         _staffRepository.save(staff);
+        return Result.Success();
     }
 
 }
