@@ -8,16 +8,16 @@ import java.util.List;
 @Getter
 public class Error {
     private final List<String> Description;
-    private final ErrorType ErrorCode;
+    private final ErrorType ErrorType;
 
     public Error(List<String> message, ErrorType errorCode) {
         this.Description = message;
-        this.ErrorCode = errorCode;
+        this.ErrorType = errorCode;
     }
 
     public Error(String message, ErrorType errorCode) {
         this.Description = new ArrayList<>();
         this.Description.add(message);
-        this.ErrorCode = errorCode;
+        this.ErrorType = errorCode;
     }
 }
