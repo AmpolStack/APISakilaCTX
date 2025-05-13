@@ -6,6 +6,11 @@ public class Result<T> extends ResultBase {
     @Getter
     private final T Data;
 
+    public Result(){
+        super();
+        this.Data = null;
+    }
+
     public Result(T data) {
         super();
         this.Data = data;
@@ -22,6 +27,10 @@ public class Result<T> extends ResultBase {
 
     public static <T> Result<T> Failed(Error error) {
         return new Result<>(error);
+    }
+
+    public static <T> Result<T> Success() {
+        return new Result<>();
     }
 
 }

@@ -1,6 +1,6 @@
 package com.sakila.sakila_project.domain.results;
 
-public enum ErrorCode {
+public enum ErrorType {
     VALIDATION_ERROR,
     FAILURE_ERROR,
     OPERATION_ERROR,
