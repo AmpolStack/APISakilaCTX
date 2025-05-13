@@ -1,6 +1,6 @@
 package com.sakila.sakila_project.infrastructure.adapters.output;
 
-import com.sakila.sakila_project.domain.ports.input.IJwtService;
+import com.sakila.sakila_project.domain.ports.output.IJwtService;
 import com.sakila.sakila_project.domain.results.Error;
 import com.sakila.sakila_project.domain.results.ErrorType;
 import com.sakila.sakila_project.domain.results.Result;

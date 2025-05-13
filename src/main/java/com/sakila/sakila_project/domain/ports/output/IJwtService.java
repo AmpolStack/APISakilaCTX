@@ -1,4 +1,4 @@
-package com.sakila.sakila_project.domain.ports.input;
+package com.sakila.sakila_project.domain.ports.output;
 
 import com.sakila.sakila_project.domain.results.Result;
 import io.jsonwebtoken.Claims;
