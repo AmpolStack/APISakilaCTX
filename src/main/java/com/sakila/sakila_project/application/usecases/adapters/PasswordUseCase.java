@@ -4,10 +4,10 @@ import com.sakila.sakila_project.application.usecases.ports.IPasswordUseCase;
 import com.sakila.sakila_project.domain.ports.output.ICacheService;
 import com.sakila.sakila_project.domain.ports.output.IEmailService;
 import com.sakila.sakila_project.domain.ports.output.repositories.sakila.StaffRepository;
-import jakarta.mail.MessagingException;
+import com.sakila.sakila_project.domain.results.Error;
+import com.sakila.sakila_project.domain.results.ErrorType;
+import com.sakila.sakila_project.domain.results.Result;
 import org.springframework.stereotype.Service;
-
-import java.util.NoSuchElementException;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
@@ -27,15 +27,29 @@ public class PasswordUseCase implements IPasswordUseCase {
     }
 
     @Override
-    public String SendRequestForUpdatePassword(int id, String newPassword, String fromAddress) throws MessagingException {
+    public Result<String> SendRequestForUpdatePassword(int id, String newPassword, String fromAddress) {
+
+        if(newPassword.isBlank()){
+            return Result.Failed(new Error("The new password are required", ErrorType.VALIDATION_ERROR));
+        }
+
         var staff = _staffRepository
                 .findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Staff not found"));
+                .orElse(null);
+
+        if(staff == null) {
+            return Result.Failed(new Error("No exist staff with this id", ErrorType.NOT_FOUND_ERROR));
+        }
 
         var correlationId = generateRandomCode();
         var cacheExp = 5;
-        _cacheService.Set(correlationId, newPassword, cacheExp, TimeUnit.MINUTES);
 
+        var cacheResp = _cacheService.Set(correlationId, newPassword, cacheExp, TimeUnit.MINUTES);
+        if(!cacheResp.isSuccess()) {
+            return Result.Failed(cacheResp.getError());
+        }
+
+        //TODO: Convert this to a template in [Resources]
         var subject = "Sakila PJT - Password Reset Code: [" + correlationId + "]";
         var body = "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"></head>"
                 + "<body style=\"font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px;\">"
@@ -48,24 +62,42 @@ public class PasswordUseCase implements IPasswordUseCase {
                 + "⏳ Code valid for " + cacheExp + " minutes</p>"
                 + "</body></html>";
 
-        _emailService
+        var emailResp =_emailService
                 .SendEmail(subject,
                         body,
                         fromAddress,
                         staff.getEmail());
 
-        return correlationId;
+        if(!emailResp.isSuccess()) {
+            return Result.Failed(emailResp.getError());
+        }
+
+        return Result.Success(correlationId);
     }
 
     @Override
-    public void UpdatePassword(int id, String correlationalId) {
-        var newPassword = _cacheService.Get(correlationalId);
+    public Result<Void> UpdatePassword(int id, String correlationalId) {
+
+        if(correlationalId.isBlank()){
+            return Result.Failed(new Error("The correlational id is required", ErrorType.VALIDATION_ERROR));
+        }
+
+        var resultCache = _cacheService.Get(correlationalId);
+        if(!resultCache.isSuccess()){
+            return Result.Failed(resultCache.getError());
+        }
+
         var staff = _staffRepository
                 .findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Staff not found"));
+                .orElse(null);
 
-        staff.setPassword(newPassword);
+        if(staff == null) {
+            return Result.Failed(new Error("No exist staff with this id", ErrorType.NOT_FOUND_ERROR));
+        }
+
+        staff.setPassword(resultCache.getData());
         _staffRepository.save(staff);
+        return Result.Success();
     }
 
     public static String generateRandomCode() {
