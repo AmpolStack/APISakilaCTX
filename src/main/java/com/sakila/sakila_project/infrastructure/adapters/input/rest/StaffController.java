@@ -59,7 +59,7 @@ public class StaffController {
         if (!resp.isSuccess()) {
             return ErrorResponse(resp);
         }
-        return ResponseEntity.ok(resp.getData());
+        return ResponseEntity.ok(resp);
     }
 
     @PatchMapping("UpdatePasswordByCorrelationId")
@@ -79,7 +79,7 @@ public class StaffController {
             return ErrorResponse(resp);
         }
 
-        return ResponseEntity.ok("Successfully Updated");
+        return ResponseEntity.ok(resp);
     }
 
     @GetMapping("/getAllStaffs")
@@ -146,7 +146,7 @@ public class StaffController {
             return ErrorResponse(resp);
         }
 
-        return ResponseEntity.ok("Successfully updated");
+        return ResponseEntity.ok(resp);
     }
 
     @GetMapping("/getByIdWithCompleteInfo")
@@ -180,7 +180,7 @@ public class StaffController {
     @GetMapping("/open/getCsrfToken")
     public ResponseEntity<?> getCsrfToken(CsrfToken csrfToken){
         try{
-            return ResponseEntity.status(HttpStatus.OK).body(csrfToken);
+            return ResponseEntity.status(HttpStatus.OK).body(Result.Success(csrfToken));
         }
         catch(Exception ex){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
@@ -188,11 +188,11 @@ public class StaffController {
     }
 
     private ResponseEntity<?> GeneralizedAuthentication(Function<IAuthStaffUseCase, Result<AuthenticationBridge>> function){
-        var action = function.apply(this.authStaffUseCase);
-        if (!action.isSuccess()){
-            return ErrorResponse(action);
+        var actionResult = function.apply(this.authStaffUseCase);
+        if (!actionResult.isSuccess()){
+            return ErrorResponse(actionResult);
         }
-        return ResponseEntity.status(HttpStatus.OK).body(action.getData());
+        return ResponseEntity.status(HttpStatus.OK).body(actionResult);
     }
 
     private static ResponseEntity<?> ErrorResponse(Result<?> result){
