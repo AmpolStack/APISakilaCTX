@@ -9,6 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface StaffRepository extends JpaRepository<Staff, Integer>{
+
     @Query("SELECT s FROM Staff s JOIN FETCH s.address WHERE s.username = :username AND s.password = :password")
     Optional<Staff> findByUsernameAndPasswordWithAddress(String username, String password);
 

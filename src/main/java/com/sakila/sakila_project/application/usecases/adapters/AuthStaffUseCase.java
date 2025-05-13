@@ -4,7 +4,7 @@ import com.sakila.sakila_project.application.custom.authentication.*;
 import com.sakila.sakila_project.application.usecases.ports.IAuthStaffUseCase;
 import com.sakila.sakila_project.domain.model.sakila.Staff;
 import com.sakila.sakila_project.domain.model.tokens.TokenRegistration;
-import com.sakila.sakila_project.domain.ports.input.IJwtService;
+import com.sakila.sakila_project.domain.ports.output.IJwtService;
 import com.sakila.sakila_project.domain.ports.output.repositories.sakila.StaffRepository;
 import com.sakila.sakila_project.domain.ports.output.repositories.tokens.TokenRegistrationRepository;
 import com.sakila.sakila_project.domain.results.Error;

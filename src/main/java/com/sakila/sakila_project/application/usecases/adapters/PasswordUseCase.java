@@ -41,6 +41,10 @@ public class PasswordUseCase implements IPasswordUseCase {
             return Result.Failed(new Error("No exist staff with this id", ErrorType.NOT_FOUND_ERROR));
         }
 
+        if(staff.getPassword().equals(newPassword.trim())){
+            return Result.Failed(new Error("The password must be different from the current one", ErrorType.VALIDATION_ERROR));
+        }
+
         var correlationId = generateRandomCode();
         var cacheExp = 5;
 

@@ -199,7 +199,7 @@ public class StaffController {
         var error = result.getError();
         HttpStatusCode statusCode;
 
-        switch (error.getErrorCode()){
+        switch (error.getErrorType()){
             case NOT_FOUND_ERROR -> statusCode = HttpStatus.NOT_FOUND;
             case OPERATION_ERROR, PROCESSING_ERROR -> statusCode = HttpStatus.UNPROCESSABLE_ENTITY;
             case FAILURE_ERROR, VALIDATION_ERROR -> statusCode = HttpStatus.BAD_REQUEST;
