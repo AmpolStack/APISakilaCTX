@@ -1,9 +1,10 @@
 package com.sakila.sakila_project.application.usecases.ports;
 
 import com.sakila.sakila_project.application.custom.authentication.*;
+import com.sakila.sakila_project.domain.results.Result;
 
 public interface IAuthStaffUseCase {
-    public AuthenticationBridge Authenticate(AuthenticationCredentials credentials);
-    public AuthenticationBridge Authenticate(AuthenticationBridge authenticationRequest);
-    public AuthenticatedUserMetadata GetMetadata(String token);
+    Result<AuthenticationBridge> Authenticate(AuthenticationCredentials credentials);
+    Result<AuthenticationBridge> Authenticate(AuthenticationBridge authenticationRequest);
+    Result<AuthenticatedUserMetadata> GetMetadata(String token);
 }

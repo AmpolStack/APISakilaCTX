@@ -2,14 +2,14 @@ package com.sakila.sakila_project.application.usecases.adapters;
 
 import com.sakila.sakila_project.application.custom.authentication.*;
 import com.sakila.sakila_project.application.usecases.ports.IAuthStaffUseCase;
-import com.sakila.sakila_project.domain.exceptions.InvalidAuthenticationException;
-import com.sakila.sakila_project.domain.exceptions.InvalidCredentialsException;
-import com.sakila.sakila_project.domain.exceptions.TokenExpiredException;
 import com.sakila.sakila_project.domain.model.sakila.Staff;
 import com.sakila.sakila_project.domain.model.tokens.TokenRegistration;
 import com.sakila.sakila_project.domain.ports.input.IJwtService;
 import com.sakila.sakila_project.domain.ports.output.repositories.sakila.StaffRepository;
 import com.sakila.sakila_project.domain.ports.output.repositories.tokens.TokenRegistrationRepository;
+import com.sakila.sakila_project.domain.results.Error;
+import com.sakila.sakila_project.domain.results.ErrorType;
+import com.sakila.sakila_project.domain.results.Result;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,55 +38,79 @@ public class AuthStaffUseCase implements IAuthStaffUseCase {
     }
 
     @Override
-    public AuthenticationBridge Authenticate(AuthenticationCredentials credentials) {
+    public Result<AuthenticationBridge> Authenticate(AuthenticationCredentials credentials) {
 
         if(credentials.getUsername().isEmpty()
                 || credentials.getPassword().isEmpty()
                 || credentials.getUsername().isBlank()
                 || credentials.getPassword().isBlank()) {
-            throw new InvalidCredentialsException("Invalid credentials");
+            return Result.Failed(new Error("username and password are required", ErrorType.VALIDATION_ERROR));
         }
+
         var staffOp = _staffRepository.findByUsernameAndPasswordWithAddress(credentials.getUsername(), credentials.getPassword());
-        var staff = staffOp.orElseThrow(() -> new InvalidCredentialsException("No exist staff registered with this credentials"));
+        var staff = staffOp.orElse(null);
+        if(staff == null) {
+            return Result.Failed(new Error("No exist staff with this credentials", ErrorType.NOT_FOUND_ERROR));
+        }
         return SaveRegistry(staff);
     }
 
     @Override
-    public AuthenticationBridge Authenticate(AuthenticationBridge authenticationRequest) {
+    public Result<AuthenticationBridge> Authenticate(AuthenticationBridge authenticationRequest) {
 
         Optional<TokenRegistration> registrationOp;
         registrationOp = _tokenRegistrationRepository.findByTokenAndRefreshToken(
                     authenticationRequest.getToken(),
                     authenticationRequest.getRefreshToken());
 
-        var registration = registrationOp.orElseThrow(() -> new InvalidCredentialsException("This credentials does not exist"));
+        var registration = registrationOp.orElse(null);
+
+        if(registration == null) {
+            return Result.Failed(new Error("No exist staff with this credentials", ErrorType.NOT_FOUND_ERROR));
+        }
 
         if(registration.getExpirationDate().before(new Date())){
-            throw new TokenExpiredException("Refresh Token has expired, please login again");
+            return Result.Failed(new Error("Refresh Token has expired, please login again", ErrorType.VALIDATION_ERROR));
         }
 
         var staffOp = _staffRepository.findByIdWithAddress(registration.getIdUser());
-        var staff = staffOp.orElseThrow(()-> new InvalidAuthenticationException("No exist staff registered with this tokens"));
+        var staff = staffOp.orElse(null);
+
+        if(staff == null) {
+            return Result.Failed(new Error("No exist staff with this id", ErrorType.NOT_FOUND_ERROR));
+        }
+
         return SaveRegistry(staff);
     }
 
     @Override
-    public AuthenticatedUserMetadata GetMetadata(String token) {
-        var claims = this._jwtService.GetAllClaims(token, _authenticationParams.getSecret());
+    public Result<AuthenticatedUserMetadata> GetMetadata(String token) {
+        var claimsResult = this._jwtService.GetAllClaims(token, _authenticationParams.getSecret());
+
+        if(!claimsResult.isSuccess()){
+            return Result.Failed(claimsResult.getError());
+        }
+
+        var claims = claimsResult.getData();
         var authenticatedUserMetadata = new AuthenticatedUserMetadata();
         authenticatedUserMetadata.setUsername(claims.getSubject());
         authenticatedUserMetadata.setId(Integer.parseInt(claims.getId()));
         authenticatedUserMetadata.setEmail(claims.get("email", String.class));
         authenticatedUserMetadata.setPhone(claims.get("phone", String.class));
-        return authenticatedUserMetadata;
+        return Result.Success(authenticatedUserMetadata);
     }
 
 
-    private AuthenticationBridge SaveRegistry(Staff staff) {
+    private Result<AuthenticationBridge> SaveRegistry(Staff staff) {
 
         var claims = StaffEntityToClaimsMap(staff);
-        var token = _jwtService.GenerateToken(claims, _authenticationParams.getTokenExpiration(), _authenticationParams.getSecret());
+        var tokenResult = _jwtService.GenerateToken(claims, _authenticationParams.getTokenExpiration(), _authenticationParams.getSecret());
 
+        if(!tokenResult.isSuccess()){
+            return Result.Failed(tokenResult.getError());
+        }
+
+        var token = tokenResult.getData();
         var refreshToken = _jwtService.GenerateRefreshToken();
 
         var tokenRegistration = new TokenRegistration();
@@ -99,9 +123,7 @@ public class AuthStaffUseCase implements IAuthStaffUseCase {
 
         _tokenRegistrationRepository.save(tokenRegistration);
 
-        return new AuthenticationBridge(
-                token,
-                refreshToken);
+        return Result.Success(new AuthenticationBridge(token, refreshToken));
     }
 
 
