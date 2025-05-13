@@ -1,10 +1,12 @@
 package com.sakila.sakila_project.domain.ports.output;
 
+import com.sakila.sakila_project.domain.results.Result;
+
 import java.util.concurrent.TimeUnit;
 
 public interface ICacheService {
-    public void Set(String key, Object value, int minutes);
-    public void Set(String key, Object value, int time, TimeUnit timeUnit);
-    public String Get(String key);
-    public String Del(String key);
+    Result<Void> Set(String key, Object value, int minutes);
+    Result<Void> Set(String key, Object value, int time, TimeUnit timeUnit);
+    Result<String> Get(String key);
+    Result<String> Del(String key);
 }
