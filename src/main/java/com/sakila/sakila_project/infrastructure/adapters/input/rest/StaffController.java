@@ -9,20 +9,16 @@ import com.sakila.sakila_project.application.usecases.ports.IAuthStaffUseCase;
 import com.sakila.sakila_project.application.usecases.ports.IGetStaffUseCase;
 import com.sakila.sakila_project.application.usecases.ports.IMutableStaffUseCase;
 import com.sakila.sakila_project.application.usecases.ports.IPasswordUseCase;
-import com.sakila.sakila_project.domain.exceptions.InvalidAuthenticationException;
-import com.sakila.sakila_project.domain.exceptions.InvalidCredentialsException;
-import com.sakila.sakila_project.domain.exceptions.TokenExpiredException;
-import io.jsonwebtoken.JwtException;
+import com.sakila.sakila_project.domain.results.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.NoSuchElementException;
 import java.util.function.Function;
 
 @Slf4j
@@ -30,171 +26,145 @@ import java.util.function.Function;
 @RequestMapping("/staff")
 public class StaffController {
 
-    private final IGetStaffUseCase _getStaffUseCase;
-    private final IAuthStaffUseCase _authStaffUseCase;
-    private final IMutableStaffUseCase _mutableStaffUseCase;
-    private final IPasswordUseCase _passwordUseCase;
+    private final IGetStaffUseCase getStaffUseCase;
+    private final IAuthStaffUseCase authStaffUseCase;
+    private final IMutableStaffUseCase mutableStaffUseCase;
+    private final IPasswordUseCase passwordUseCase;
 
     @Value("${spring.email.username}")
-    private String _emailFrom;
+    private String emailFrom;
 
     @Autowired
     public StaffController(IAuthStaffUseCase authStaffUseCase,
                            IGetStaffUseCase getStaffUseCase,
                            IMutableStaffUseCase mutableStaffUseCase,
                            IPasswordUseCase passwordUseCase) {
-        _authStaffUseCase = authStaffUseCase;
-        _getStaffUseCase = getStaffUseCase;
-        _mutableStaffUseCase = mutableStaffUseCase;
-        _passwordUseCase = passwordUseCase;
+        this.authStaffUseCase = authStaffUseCase;
+        this.getStaffUseCase = getStaffUseCase;
+        this.mutableStaffUseCase = mutableStaffUseCase;
+        this.passwordUseCase = passwordUseCase;
     }
 
     @GetMapping("/requestPasswordUpdate")
     public ResponseEntity<?> requestPasswordUpdate(@RequestParam String newPassword) {
-        try{
-            var auth = SecurityContextHolder.getContext().getAuthentication();
+        var auth = SecurityContextHolder.getContext().getAuthentication();
 
-            if(!(auth.getPrincipal() instanceof AuthenticatedUser)){
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This user not have permission to access this resource");
-            }
-            var id = ((AuthenticatedUser) auth.getPrincipal()).getId();
+        if(!(auth.getPrincipal() instanceof AuthenticatedUser)){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This user not have permission to access this resource");
+        }
+        var id = ((AuthenticatedUser) auth.getPrincipal()).getId();
 
-            var resp = _passwordUseCase.SendRequestForUpdatePassword(id, newPassword, _emailFrom);
-            return ResponseEntity.ok(resp);
+        var resp = this.passwordUseCase.SendRequestForUpdatePassword(id, newPassword, this.emailFrom);
+
+        if (!resp.isSuccess()) {
+            return ErrorResponse(resp);
         }
-        catch(Exception ex){
-            log.error(ex.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+        return ResponseEntity.ok(resp.getData());
     }
 
     @PatchMapping("UpdatePasswordByCorrelationId")
     public ResponseEntity<?> updatePasswordByCorrelationId(@RequestParam String correlationId){
-        try{
 
-            var auth = SecurityContextHolder.getContext().getAuthentication();
+        var auth = SecurityContextHolder.getContext().getAuthentication();
 
-            if(!(auth.getPrincipal() instanceof AuthenticatedUser)){
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This user not have permission to access this resource");
-            }
-            var id = ((AuthenticatedUser) auth.getPrincipal()).getId();
-            _passwordUseCase.UpdatePassword(id, correlationId);
-            return ResponseEntity.ok("Successfully Updated");
+        if(!(auth.getPrincipal() instanceof AuthenticatedUser)){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This user not have permission to access this resource");
         }
-        catch(Exception ex){
-            log.error(ex.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+
+        var id = ((AuthenticatedUser) auth.getPrincipal()).getId();
+
+        var resp = this.passwordUseCase.UpdatePassword(id, correlationId);
+
+        if (!resp.isSuccess()) {
+            return ErrorResponse(resp);
         }
+
+        return ResponseEntity.ok("Successfully Updated");
     }
 
     @GetMapping("/getAllStaffs")
     public ResponseEntity<?> getAllStaffs(){
-        try{
-            var resp = _getStaffUseCase.AllWithBasicInfo();
+            var resp = this.getStaffUseCase.AllWithBasicInfo();
+
+            if (!resp.isSuccess()) {
+                return ErrorResponse(resp);
+            }
+
             return ResponseEntity.ok(resp);
-        }
-        catch(Exception ex){
-            return ErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
     @PutMapping("/updateAllBaseProperties")
     public ResponseEntity<?> updateAllProperties(@RequestBody BaseStaffDto dto){
-        try{
-            var auth = SecurityContextHolder.getContext().getAuthentication();
 
-            if(!(auth.getPrincipal() instanceof AuthenticatedUser)){
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This user not have permission to access this resource");
-            }
-            var id = ((AuthenticatedUser) auth.getPrincipal()).getId();
+        var auth = SecurityContextHolder.getContext().getAuthentication();
 
-            var resp = _mutableStaffUseCase.updateAllStaffProperties(dto, id);
-            return ResponseEntity.ok(resp);
+        if(!(auth.getPrincipal() instanceof AuthenticatedUser)){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This user not have permission to access this resource");
         }
-        catch (NoSuchElementException ex){
-            return ErrorResponse(ex, HttpStatus.NOT_FOUND);
+        var id = ((AuthenticatedUser) auth.getPrincipal()).getId();
+
+        var resp = this.mutableStaffUseCase.updateAllStaffProperties(dto, id);
+
+        if (!resp.isSuccess()) {
+            return ErrorResponse(resp);
         }
-        catch (IllegalStateException ex){
-            return ErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        catch(Exception e){
-            return ErrorResponse(e, HttpStatus.SERVICE_UNAVAILABLE);
-        }
+
+        return ResponseEntity.ok(resp);
     }
 
     @PatchMapping("/updateAddress")
     public ResponseEntity<?> updateAddress(@RequestBody BaseAddressDto dto){
-        try{
-            var auth = SecurityContextHolder.getContext().getAuthentication();
+        var auth = SecurityContextHolder.getContext().getAuthentication();
 
-            if(!(auth.getPrincipal() instanceof AuthenticatedUser)){
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This user not have permission to access this resource");
-            }
-            var id = ((AuthenticatedUser) auth.getPrincipal()).getId();
+        if(!(auth.getPrincipal() instanceof AuthenticatedUser)){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This user not have permission to access this resource");
+        }
+        var id = ((AuthenticatedUser) auth.getPrincipal()).getId();
 
-            var resp = _mutableStaffUseCase.updateAddresses(dto, id);
-            return ResponseEntity.ok(resp);
+        var resp = this.mutableStaffUseCase.updateAddresses(dto, id);
 
+        if (!resp.isSuccess()) {
+            return ErrorResponse(resp);
         }
-        catch (NoSuchElementException ex){
-            return ErrorResponse(ex, HttpStatus.NOT_FOUND);
-        }
-        catch (IllegalStateException ex){
-            return ErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        catch(Exception e){
-            return ErrorResponse(e, HttpStatus.SERVICE_UNAVAILABLE);
-        }
+
+        return ResponseEntity.ok(resp);
     }
 
     @PatchMapping("/updateAssignedStore")
     public ResponseEntity<?> updateAssignedStore(@RequestParam int storeId){
-        try{
-            var auth = SecurityContextHolder.getContext().getAuthentication();
 
-            if(!(auth.getPrincipal() instanceof AuthenticatedUser)){
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This user not have permission to access this resource");
-            }
-            var id = ((AuthenticatedUser) auth.getPrincipal()).getId();
+        var auth = SecurityContextHolder.getContext().getAuthentication();
 
-            _mutableStaffUseCase.updateAssignedStore(storeId, id);
+        if(!(auth.getPrincipal() instanceof AuthenticatedUser)){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This user not have permission to access this resource");
+        }
+        var id = ((AuthenticatedUser) auth.getPrincipal()).getId();
 
-            return ResponseEntity.ok("Successfully updated");
+        var resp = this.mutableStaffUseCase.updateAssignedStore(storeId, id);
+
+        if (!resp.isSuccess()) {
+            return ErrorResponse(resp);
         }
-        catch (NoSuchElementException ex){
-            return ErrorResponse(ex, HttpStatus.NOT_FOUND);
-        }
-        catch (IllegalStateException ex){
-            return ErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        catch(Exception e){
-            return ErrorResponse(e, HttpStatus.SERVICE_UNAVAILABLE);
-        }
+
+        return ResponseEntity.ok("Successfully updated");
     }
 
     @GetMapping("/getByIdWithCompleteInfo")
     public ResponseEntity<?> getAllInfo(){
-        try{
+        var auth = SecurityContextHolder.getContext().getAuthentication();
 
-            var auth = SecurityContextHolder.getContext().getAuthentication();
-
-            if(!(auth.getPrincipal() instanceof AuthenticatedUser)){
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This user not have permission to access this resource");
+        if(!(auth.getPrincipal() instanceof AuthenticatedUser)){
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This user not have permission to access this resource");
             }
-            var id = ((AuthenticatedUser) auth.getPrincipal()).getId();
+        var id = ((AuthenticatedUser) auth.getPrincipal()).getId();
 
-            var resp = _getStaffUseCase.WithCompleteInfo(id);
-            return ResponseEntity.ok(resp);
+        var resp = this.getStaffUseCase.WithCompleteInfo(id);
+
+        if (!resp.isSuccess()) {
+            return ErrorResponse(resp);
         }
-        catch (NoSuchElementException ex){
-            return ErrorResponse(ex, HttpStatus.NOT_FOUND);
-        }
-        catch (IllegalStateException ex){
-            return ErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        catch(Exception e){
-            return ErrorResponse(e, HttpStatus.SERVICE_UNAVAILABLE);
-        }
+
+        return ResponseEntity.ok(resp);
     }
 
     @PostMapping("/open/obtainAuthentication")
@@ -213,30 +183,30 @@ public class StaffController {
             return ResponseEntity.status(HttpStatus.OK).body(csrfToken);
         }
         catch(Exception ex){
-            return ErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
         }
     }
 
-
-    private ResponseEntity<?> GeneralizedAuthentication(Function<IAuthStaffUseCase, AuthenticationBridge> function){
-        try{
-            var action = function.apply(_authStaffUseCase);
-            return ResponseEntity.status(HttpStatus.OK).body(action);
+    private ResponseEntity<?> GeneralizedAuthentication(Function<IAuthStaffUseCase, Result<AuthenticationBridge>> function){
+        var action = function.apply(this.authStaffUseCase);
+        if (!action.isSuccess()){
+            return ErrorResponse(action);
         }
-        catch (InvalidCredentialsException | JwtException ex){
-            return ErrorResponse(ex, HttpStatus.BAD_REQUEST);
-        }
-        catch (InvalidAuthenticationException | TokenExpiredException ex){
-            return ErrorResponse(ex, HttpStatus.UNAUTHORIZED);
-        }
-        catch (Exception ex){
-            return ErrorResponse(ex, HttpStatus.SERVICE_UNAVAILABLE);
-        }
+        return ResponseEntity.status(HttpStatus.OK).body(action.getData());
     }
 
+    private static ResponseEntity<?> ErrorResponse(Result<?> result){
+        var error = result.getError();
+        HttpStatusCode statusCode;
 
-    private static ResponseEntity<?> ErrorResponse(Exception exception, HttpStatus status){
-        log.error(exception.getMessage());
-        return ResponseEntity.status(status).body(exception.getMessage());
+        switch (error.getErrorCode()){
+            case NOT_FOUND_ERROR -> statusCode = HttpStatus.NOT_FOUND;
+            case OPERATION_ERROR, PROCESSING_ERROR -> statusCode = HttpStatus.UNPROCESSABLE_ENTITY;
+            case FAILURE_ERROR, VALIDATION_ERROR -> statusCode = HttpStatus.BAD_REQUEST;
+            default -> statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+
+        log.error(error.getDescription().toString());
+        return ResponseEntity.status(statusCode).body(result);
     }
 }

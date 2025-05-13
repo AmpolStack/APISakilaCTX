@@ -23,14 +23,14 @@ import java.io.IOException;
 @Slf4j
 public class JwtSecurityFilter extends OncePerRequestFilter {
 
-    private final IJwtService _jwtService;
+    private final IJwtService jwtService;
     private final HandlerExceptionResolver handlerExceptionResolver;
     @Value("${spring.security.jwt.secret}")
-    private String _secret;
+    private String secret;
 
     @Autowired
     public JwtSecurityFilter(IJwtService jwtService, HandlerExceptionResolver handlerExceptionResolver) {
-        _jwtService = jwtService;
+        this.jwtService = jwtService;
         this.handlerExceptionResolver = handlerExceptionResolver;
     }
 
@@ -64,13 +64,21 @@ public class JwtSecurityFilter extends OncePerRequestFilter {
 
         final var token = tokenHeader.substring("Bearer ".length());
 
-        if(!this._jwtService.IsTokenExpired(token, _secret)){
-            log.error("the token is invalid");
+        var expResult = this.jwtService.IsTokenExpired(token, this.secret);
+        if(!expResult.isSuccess()){
+            log.error(expResult.getError().getDescription().toString());
             return;
         }
 
         log.info("PROCESSING TOKEN... {}", token);
-        final var claims = this._jwtService.GetAllClaims(token, _secret);
+        final var claimsResult = this.jwtService.GetAllClaims(token, this.secret);
+
+        if(!claimsResult.isSuccess()){
+            log.error(claimsResult.getError().getDescription().toString());
+            return;
+        }
+
+        final var claims = claimsResult.getData();
         var name = claims.getSubject();
         var id = claims.getId();
         var phone = claims.get("phone", String.class);
