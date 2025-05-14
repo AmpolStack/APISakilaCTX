@@ -1,4 +1,4 @@
-package com.sakila.sakila_project.application.usecases.ports;
+package com.sakila.sakila_project.application.usecases.ports.film_operations;
 
 import com.sakila.sakila_project.application.dto.BaseFilmDto;
 import com.sakila.sakila_project.application.dto.ExtendedFilmDto;
