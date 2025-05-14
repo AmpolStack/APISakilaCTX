@@ -1,11 +1,11 @@
-package com.sakila.sakila_project.application.usecases.adapters;
+package com.sakila.sakila_project.application.usecases.adapters.staff_operations;
 
 import com.sakila.sakila_project.application.dto.BaseAddressDto;
 import com.sakila.sakila_project.application.dto.BaseStaffDto;
 import com.sakila.sakila_project.application.dto.ExtendedStaffDto;
 import com.sakila.sakila_project.application.maps.BaseDtoMapper;
 import com.sakila.sakila_project.application.maps.StaffDtoMapper;
-import com.sakila.sakila_project.application.usecases.ports.IMutableStaffUseCase;
+import com.sakila.sakila_project.application.usecases.ports.staff_operations.IMutableStaffUseCase;
 import com.sakila.sakila_project.domain.ports.output.repositories.sakila.StaffRepository;
 import com.sakila.sakila_project.domain.results.Error;
 import com.sakila.sakila_project.domain.results.ErrorType;

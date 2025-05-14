@@ -1,4 +1,4 @@
-package com.sakila.sakila_project.application.usecases.adapters;
+package com.sakila.sakila_project.application.usecases.adapters.staff_operations;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,7 +6,7 @@ import com.sakila.sakila_project.application.dto.BaseStaffDto;
 import com.sakila.sakila_project.application.dto.ExtendedStaffDto;
 import com.sakila.sakila_project.application.maps.BaseDtoMapper;
 import com.sakila.sakila_project.application.maps.StaffDtoMapper;
-import com.sakila.sakila_project.application.usecases.ports.IGetStaffUseCase;
+import com.sakila.sakila_project.application.usecases.ports.staff_operations.IGetStaffUseCase;
 import com.sakila.sakila_project.domain.model.sakila.Staff;
 import com.sakila.sakila_project.domain.ports.output.ICacheService;
 import com.sakila.sakila_project.domain.ports.output.repositories.sakila.StaffRepository;

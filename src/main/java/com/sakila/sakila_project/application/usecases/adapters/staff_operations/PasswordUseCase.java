@@ -1,6 +1,6 @@
-package com.sakila.sakila_project.application.usecases.adapters;
+package com.sakila.sakila_project.application.usecases.adapters.staff_operations;
 
-import com.sakila.sakila_project.application.usecases.ports.IPasswordUseCase;
+import com.sakila.sakila_project.application.usecases.ports.staff_operations.IPasswordUseCase;
 import com.sakila.sakila_project.domain.ports.output.ICacheService;
 import com.sakila.sakila_project.domain.ports.output.IEmailService;
 import com.sakila.sakila_project.domain.ports.output.repositories.sakila.StaffRepository;

@@ -5,10 +5,10 @@ import com.sakila.sakila_project.application.custom.authentication.Authenticatio
 import com.sakila.sakila_project.application.custom.authentication.AuthenticationCredentials;
 import com.sakila.sakila_project.application.dto.BaseAddressDto;
 import com.sakila.sakila_project.application.dto.BaseStaffDto;
-import com.sakila.sakila_project.application.usecases.ports.IAuthStaffUseCase;
-import com.sakila.sakila_project.application.usecases.ports.IGetStaffUseCase;
-import com.sakila.sakila_project.application.usecases.ports.IMutableStaffUseCase;
-import com.sakila.sakila_project.application.usecases.ports.IPasswordUseCase;
+import com.sakila.sakila_project.application.usecases.ports.staff_operations.IAuthStaffUseCase;
+import com.sakila.sakila_project.application.usecases.ports.staff_operations.IGetStaffUseCase;
+import com.sakila.sakila_project.application.usecases.ports.staff_operations.IMutableStaffUseCase;
+import com.sakila.sakila_project.application.usecases.ports.staff_operations.IPasswordUseCase;
 import com.sakila.sakila_project.domain.results.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

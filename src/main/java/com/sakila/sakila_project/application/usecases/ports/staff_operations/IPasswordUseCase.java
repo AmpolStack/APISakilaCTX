@@ -1,4 +1,4 @@
-package com.sakila.sakila_project.application.usecases.ports;
+package com.sakila.sakila_project.application.usecases.ports.staff_operations;
 
 import com.sakila.sakila_project.domain.results.Result;
 

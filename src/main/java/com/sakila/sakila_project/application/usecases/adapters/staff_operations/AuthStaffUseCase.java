@@ -1,7 +1,7 @@
-package com.sakila.sakila_project.application.usecases.adapters;
+package com.sakila.sakila_project.application.usecases.adapters.staff_operations;
 
 import com.sakila.sakila_project.application.custom.authentication.*;
-import com.sakila.sakila_project.application.usecases.ports.IAuthStaffUseCase;
+import com.sakila.sakila_project.application.usecases.ports.staff_operations.IAuthStaffUseCase;
 import com.sakila.sakila_project.domain.model.sakila.Staff;
 import com.sakila.sakila_project.domain.model.tokens.TokenRegistration;
 import com.sakila.sakila_project.domain.ports.output.IJwtService;
