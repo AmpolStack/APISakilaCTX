@@ -31,6 +31,6 @@ public class Film {
     private Date last_update;
     @OneToMany(mappedBy = "film")
     private Set<Inventory> inventory;
-//    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "films")
-//    private Set<Actor> actors;
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "films")
+    private Set<Actor> actors;
 }

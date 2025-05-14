@@ -1,5 +1,6 @@
 package com.sakila.sakila_project.application.dto;
 
+import com.sakila.sakila_project.domain.model.sakila.Language;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,4 +19,5 @@ public class BaseFilmDto {
     private String rating;
     private String special_features;
     private Date last_update;
+    private BaseLanguageDto language;
 }
