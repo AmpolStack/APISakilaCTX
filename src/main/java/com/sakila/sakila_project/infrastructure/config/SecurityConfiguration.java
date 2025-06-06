@@ -90,11 +90,13 @@ public class SecurityConfiguration {
         var defaultConfig = new CorsConfiguration();
         defaultConfig.setAllowedOriginPatterns(List.of("*"));
         defaultConfig.setAllowCredentials(true);
+        defaultConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         defaultConfig.setAllowedHeaders(List.of("*"));
 
         var speConfig = new CorsConfiguration();
-        speConfig.setAllowedOriginPatterns(List.of("http://localhost:5500"));
+        speConfig.setAllowedOriginPatterns(List.of( "http://localhost:4200"));
         speConfig.setAllowedHeaders(List.of("*"));
+        defaultConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         speConfig.setAllowCredentials(true);
 
         var source = new UrlBasedCorsConfigurationSource();
