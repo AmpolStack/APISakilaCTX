@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -33,4 +34,10 @@ public class Film {
     private Set<Inventory> inventory;
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "films")
     private Set<Actor> actors;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "film_category",
+            joinColumns = @JoinColumn(name = "film_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id"))
+    private List<Category> categories;
 }

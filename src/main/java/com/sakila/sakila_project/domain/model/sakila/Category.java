@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -12,8 +13,11 @@ import java.util.Date;
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "category_id")
     private int id;
     @Column(nullable = false, length = 25)
     private String name;
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "categories")
+    private Set<Film> films;
     private Date last_update;
 }
