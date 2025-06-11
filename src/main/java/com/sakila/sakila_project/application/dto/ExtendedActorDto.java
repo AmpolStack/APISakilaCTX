@@ -8,5 +8,5 @@ import java.util.List;
 @Getter
 @Setter
 public class ExtendedActorDto extends BaseActorDto {
-    private List<ExtendedFilmDto> films;
+    private List<BaseFilmDto> films;
 }

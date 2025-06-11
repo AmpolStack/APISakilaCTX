@@ -9,6 +9,7 @@ import java.util.Date;
 @Getter
 @Setter
 public class BaseFilmDto {
+    private int id;
     private String title;
     private String description;
     private int release_year;
@@ -19,5 +20,5 @@ public class BaseFilmDto {
     private String rating;
     private String special_features;
     private Date last_update;
-    private BaseLanguageDto language;
+    private String language;
 }
