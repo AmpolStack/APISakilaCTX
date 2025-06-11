@@ -25,9 +25,10 @@ spring:
   security:
     jwt:
 #      tokenExpiration: 60000
-      tokenExpiration: 360000
-      ## secret: your_256_bits_string_secret
-      refreshTokenExpiration: 180000
+      tokenExpiration: 600000
+#      ## secret: your_256_bits_string_secret
+#      refreshTokenExpiration: 180000
+      refreshTokenExpiration: 172800000
       latencyInMs: 5000
   email:
     ## username: your_email_address_name
