@@ -33,7 +33,7 @@ public class Film {
     @OneToMany(mappedBy = "film")
     private Set<Inventory> inventory;
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "films")
-    private Set<Actor> actors;
+    private List<Actor> actors;
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "film_category",
