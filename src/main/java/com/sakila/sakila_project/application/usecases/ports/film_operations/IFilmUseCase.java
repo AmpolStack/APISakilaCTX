@@ -1,7 +1,7 @@
 package com.sakila.sakila_project.application.usecases.ports.film_operations;
 
-import com.sakila.sakila_project.application.dto.BaseFilmDto;
-import com.sakila.sakila_project.application.dto.ExtendedFilmDto;
+import com.sakila.sakila_project.application.dto.Film.BaseFilmDto;
+import com.sakila.sakila_project.application.dto.Film.ExtendedFilmDto;
 import com.sakila.sakila_project.domain.results.Result;
 
 import java.util.List;
