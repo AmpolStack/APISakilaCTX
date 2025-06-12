@@ -1,8 +1,9 @@
 package com.sakila.sakila_project.application.dto;
 
+import com.sakila.sakila_project.application.dto.Film.BaseFilmDto;
+import com.sakila.sakila_project.application.dto.Film.MinimalFilmDto;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.tomcat.util.modeler.BaseAttributeFilter;
 
 import java.util.List;
 
@@ -10,5 +11,5 @@ import java.util.List;
 @Setter
 public class ExtendedCategoryDto {
     private String name;
-    private List<BaseFilmDto> films;
+    private List<MinimalFilmDto> films;
 }
