@@ -1,5 +1,6 @@
 package com.sakila.sakila_project.application.dto;
 
+import com.sakila.sakila_project.application.dto.Film.BaseFilmDto;
 import lombok.Getter;
 import lombok.Setter;
 
