@@ -1,9 +1,9 @@
 package com.sakila.sakila_project.application.maps;
 
-import com.sakila.sakila_project.application.dto.BaseActorDto;
-import com.sakila.sakila_project.application.dto.BaseAddressDto;
-import com.sakila.sakila_project.application.dto.Film.BaseFilmDto;
-import com.sakila.sakila_project.application.dto.BaseStaffDto;
+import com.sakila.sakila_project.application.dto.actor.RequestActorDto;
+import com.sakila.sakila_project.application.dto.others.AddressDto;
+import com.sakila.sakila_project.application.dto.film.FilmDto;
+import com.sakila.sakila_project.application.dto.staff.StaffDto;
 import com.sakila.sakila_project.domain.model.sakila.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -14,27 +14,27 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface BaseDtoMapper {
 
-    BaseActorDto toMinimalActorDto(Actor dto);
+    RequestActorDto toMinimalActorDto(Actor dto);
 
-    Staff toStaff(BaseStaffDto dto);
+    Staff toStaff(StaffDto dto);
 
-    Address toAddress(BaseAddressDto dto);
+    Address toAddress(AddressDto dto);
 
-    List<BaseActorDto> toMinimalActorDtoList(List<Actor> dtoList);
+    List<RequestActorDto> toMinimalActorDtoList(List<Actor> dtoList);
 
-    Actor toActor(BaseActorDto actor);
+    Actor toActor(RequestActorDto actor);
 
-    BaseStaffDto toMinStaffDto(Staff staff);
+    StaffDto toMinStaffDto(Staff staff);
 
-    List<BaseStaffDto> toMinStaffDtoList(List<Staff> dtoList);
+    List<StaffDto> toMinStaffDtoList(List<Staff> dtoList);
 
-    @Mapping(source = "language", target = "language", qualifiedByName = "languageToString")
-    BaseFilmDto toBaseFilmDto(Film film);
+    @Mapping(source = "language", target = "language", qualifiedByName = "languageToStringLanguage")
+    FilmDto toFilmDto(Film film);
 
-    List<BaseFilmDto> toBaseFilmDtoList(List<Film> films);
+    List<FilmDto> toFilmDtoList(List<Film> films);
 
-    @Named("languageToString")
-    default String languageToString(Language language) {
-        return language != null ? language.getName() : null;
+    @Named("languageToStringLanguage")
+    default String languageToStringLanguage(Language language) {
+        return language != null ? language.getName() : "";
     }
 }
