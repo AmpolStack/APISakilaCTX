@@ -1,8 +1,8 @@
-package com.sakila.sakila_project.application.usecases.adapters.staff_operations;
+package com.sakila.sakila_project.application.usecases.adapters.staffUseCases;
 
 import com.sakila.sakila_project.application.usecases.ports.staff_operations.IPasswordUseCase;
-import com.sakila.sakila_project.domain.ports.output.ICacheService;
-import com.sakila.sakila_project.domain.ports.output.IEmailService;
+import com.sakila.sakila_project.domain.ports.output.services.ICacheService;
+import com.sakila.sakila_project.domain.ports.output.services.IEmailService;
 import com.sakila.sakila_project.domain.ports.output.repositories.sakila.StaffRepository;
 import com.sakila.sakila_project.domain.results.Error;
 import com.sakila.sakila_project.domain.results.ErrorType;

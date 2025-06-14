@@ -1,14 +1,14 @@
-package com.sakila.sakila_project.application.usecases.adapters.staff_operations;
+package com.sakila.sakila_project.application.usecases.adapters.staffUseCases;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sakila.sakila_project.application.dto.staff.BaseStaffDto;
-import com.sakila.sakila_project.application.dto.staff.ExtendedStaffDto;
+import com.sakila.sakila_project.application.dto.staff.StaffDto;
+import com.sakila.sakila_project.application.dto.staff.StaffWithStoreAndAddressDto;
 import com.sakila.sakila_project.application.maps.BaseDtoMapper;
 import com.sakila.sakila_project.application.maps.StaffDtoMapper;
 import com.sakila.sakila_project.application.usecases.ports.staff_operations.IGetStaffUseCase;
 import com.sakila.sakila_project.domain.model.sakila.Staff;
-import com.sakila.sakila_project.domain.ports.output.ICacheService;
+import com.sakila.sakila_project.domain.ports.output.services.ICacheService;
 import com.sakila.sakila_project.domain.ports.output.repositories.sakila.StaffRepository;
 import com.sakila.sakila_project.domain.results.Error;
 import com.sakila.sakila_project.domain.results.ErrorType;
@@ -39,13 +39,13 @@ public class GetStaffUseCase implements IGetStaffUseCase {
 
 
     @Override
-    public Result<ExtendedStaffDto> WithCompleteInfo(int id) {
-        return getStaff(id, this.staffDtoMapper::toDto, ExtendedStaffDto.class );
+    public Result<StaffWithStoreAndAddressDto> WithCompleteInfo(int id) {
+        return getStaff(id, this.staffDtoMapper::toDto, StaffWithStoreAndAddressDto.class );
     }
 
     @Override
-    public Result<BaseStaffDto> WithBasicInfo(int id) {
-        return getStaff(id, this.baseDtoMapper::toMinStaffDto, BaseStaffDto.class);
+    public Result<StaffDto> WithBasicInfo(int id) {
+        return getStaff(id, this.baseDtoMapper::toMinStaffDto, StaffDto.class);
     }
 
 
@@ -98,13 +98,13 @@ public class GetStaffUseCase implements IGetStaffUseCase {
     }
 
     @Override
-    public Result<List<BaseStaffDto>> AllWithBasicInfo() {
+    public Result<List<StaffDto>> AllWithBasicInfo() {
         var staffList = getStaffList();
         return Result.Success(this.baseDtoMapper.toMinStaffDtoList(staffList));
     }
 
     @Override
-    public Result<List<ExtendedStaffDto>> AllWithCompleteInfo() {
+    public Result<List<StaffWithStoreAndAddressDto>> AllWithCompleteInfo() {
         var staffList = getStaffList();
         return Result.Success(this.staffDtoMapper.toListDto(staffList));
     }
