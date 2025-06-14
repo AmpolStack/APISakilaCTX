@@ -2,8 +2,8 @@ package com.sakila.sakila_project.infrastructure.adapters.input.rest;
 
 import com.sakila.sakila_project.application.custom.authentication.AuthenticationBridge;
 import com.sakila.sakila_project.application.custom.authentication.AuthenticationCredentials;
-import com.sakila.sakila_project.application.dto.BaseAddressDto;
-import com.sakila.sakila_project.application.dto.BaseStaffDto;
+import com.sakila.sakila_project.application.dto.others.AddressDto;
+import com.sakila.sakila_project.application.dto.staff.StaffDto;
 import com.sakila.sakila_project.application.usecases.ports.staff_operations.IAuthStaffUseCase;
 import com.sakila.sakila_project.application.usecases.ports.staff_operations.IGetStaffUseCase;
 import com.sakila.sakila_project.application.usecases.ports.staff_operations.IMutableStaffUseCase;
@@ -62,7 +62,7 @@ public class StaffController {
     }
 
     @PutMapping("/updateAllBaseProperties")
-    public ResponseEntity<?> updateAllProperties(@RequestBody BaseStaffDto dto){
+    public ResponseEntity<?> updateAllProperties(@RequestBody StaffDto dto){
         return ResponseHandler.SendResponse((authCtx) -> {
            var id = authCtx.getId();
            return this.mutableStaffUseCase.updateAllStaffProperties(dto, id);
@@ -70,7 +70,7 @@ public class StaffController {
     }
 
     @PatchMapping("/updateAddress")
-    public ResponseEntity<?> updateAddress(@RequestBody BaseAddressDto dto){
+    public ResponseEntity<?> updateAddress(@RequestBody AddressDto dto){
         return ResponseHandler.SendResponse((authCtx) ->{
            var id = authCtx.getId();
            return this.mutableStaffUseCase.updateAddresses(dto, id);
