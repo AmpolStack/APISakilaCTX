@@ -8,6 +8,6 @@ import java.util.List;
 
 @Getter
 @Setter
-public class ActorWithFilmsDto extends ActorDto {
+public class RequestActorWithFilmsDto extends RequestActorDto {
     private List<FilmDto> films;
 }

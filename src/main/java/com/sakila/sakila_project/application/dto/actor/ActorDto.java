@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class RequestActorDto {
-    private String first_name;
-    private String last_name;
+public class ActorDto{
+    private String referenceId;
+    private String name;
 }
