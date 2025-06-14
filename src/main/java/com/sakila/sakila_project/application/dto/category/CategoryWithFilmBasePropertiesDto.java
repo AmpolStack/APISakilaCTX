@@ -1,6 +1,6 @@
 package com.sakila.sakila_project.application.dto.category;
 
-import com.sakila.sakila_project.application.dto.Film.MinimalFilmDto;
+import com.sakila.sakila_project.application.dto.film.FilmBasePropertiesDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,5 +10,5 @@ import java.util.List;
 @Setter
 public class BaseCategoryDto {
     private String name;
-    private List<MinimalFilmDto> films;
+    private List<FilmBasePropertiesDto> films;
 }

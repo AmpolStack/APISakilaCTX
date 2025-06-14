@@ -1,9 +1,7 @@
 package com.sakila.sakila_project.application.usecases.adapters.film_operations;
 
-import com.sakila.sakila_project.application.dto.Film.BaseFilmDto;
-import com.sakila.sakila_project.application.dto.Film.ExtendedFilmDto;
-import com.sakila.sakila_project.application.dto.category.BaseCategoryDto;
-import com.sakila.sakila_project.application.dto.category.ExtendedCategoryDto;
+import com.sakila.sakila_project.application.dto.film.FilmWithActorsDto;
+import com.sakila.sakila_project.application.dto.category.CategoryWithFilmBasePropertiesDto;
 import com.sakila.sakila_project.application.maps.BaseDtoMapper;
 import com.sakila.sakila_project.application.maps.CategoryDtoMapper;
 import com.sakila.sakila_project.application.maps.FilmDtoMapper;
@@ -40,14 +38,14 @@ public class GetFilmsUseCase implements IGetFilmsUseCase {
     }
 
     @Override
-    public Result<List<BaseCategoryDto>> getFilmsInfo() {
+    public Result<List<CategoryWithFilmBasePropertiesDto>> getFilmsInfo() {
         var categories = categoryRepository.findAllCategoriesWithFilms();
         var mapping = this.categoryMapper.toBaseCategoryDtoList(categories);
         return Result.Success(mapping);
     }
 
     @Override
-    public Result<ExtendedFilmDto> getFilm(String referenceId) {
+    public Result<FilmWithActorsDto> getFilm(String referenceId) {
 
         byte[] bytes;
 

@@ -1,9 +1,7 @@
-package com.sakila.sakila_project.application.dto.Film;
+package com.sakila.sakila_project.application.dto.film;
 
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.Date;
 
 @Getter
 @Setter

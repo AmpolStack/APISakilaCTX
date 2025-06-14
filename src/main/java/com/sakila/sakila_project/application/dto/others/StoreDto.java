@@ -3,12 +3,10 @@ package com.sakila.sakila_project.application.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
-
 @Getter
 @Setter
-public class ExtendedStoreDto {
+public class StoreDto {
     private int id;
-    private BaseAddressDto address;
-    private Date last_update;
+    private AddressDto address;
+//    private int managerStaffId;
 }

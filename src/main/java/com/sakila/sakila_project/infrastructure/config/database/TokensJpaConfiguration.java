@@ -1,4 +1,4 @@
-package com.sakila.sakila_project.infrastructure.config.Jpa;
+package com.sakila.sakila_project.infrastructure.config.database;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
@@ -19,7 +19,7 @@ import java.util.Objects;
         transactionManagerRef = "TokensTM"
 )
 @EnableTransactionManagement
-public class TokensJpa {
+public class TokensJpaConfiguration {
 
     @Bean("TokensEMF")
     public LocalContainerEntityManagerFactoryBean TKEntityManagerFactory(

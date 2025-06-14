@@ -6,7 +6,7 @@ import lombok.Setter;
 import java.util.Date;
 @Getter
 @Setter
-public class BaseCustomerDto {
+public class CustomerDto {
     private String first_name;
     private String last_name;
     private String email;

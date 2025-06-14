@@ -1,4 +1,4 @@
-package com.sakila.sakila_project.application.dto;
+package com.sakila.sakila_project.application.dto.staff;
 
 import lombok.Getter;
 import lombok.Setter;

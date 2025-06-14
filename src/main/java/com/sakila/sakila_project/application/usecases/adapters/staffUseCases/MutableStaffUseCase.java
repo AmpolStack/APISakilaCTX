@@ -1,8 +1,8 @@
 package com.sakila.sakila_project.application.usecases.adapters.staff_operations;
 
-import com.sakila.sakila_project.application.dto.BaseAddressDto;
-import com.sakila.sakila_project.application.dto.BaseStaffDto;
-import com.sakila.sakila_project.application.dto.ExtendedStaffDto;
+import com.sakila.sakila_project.application.dto.others.AddressDto;
+import com.sakila.sakila_project.application.dto.staff.BaseStaffDto;
+import com.sakila.sakila_project.application.dto.staff.ExtendedStaffDto;
 import com.sakila.sakila_project.application.maps.BaseDtoMapper;
 import com.sakila.sakila_project.application.maps.StaffDtoMapper;
 import com.sakila.sakila_project.application.usecases.ports.staff_operations.IMutableStaffUseCase;
@@ -68,7 +68,7 @@ public class MutableStaffUseCase implements IMutableStaffUseCase {
     //TODO: CHANGES THE LOGIC
     @Override
     @Transactional
-    public Result<ExtendedStaffDto> updateAddresses(BaseAddressDto addressDto, int staffId) {
+    public Result<ExtendedStaffDto> updateAddresses(AddressDto addressDto, int staffId) {
 
         var staff = this.staffRepository.findByIdWithAddress(staffId)
                 .orElse(null);
