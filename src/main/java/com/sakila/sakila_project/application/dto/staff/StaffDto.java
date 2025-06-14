@@ -7,7 +7,7 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class BaseStaffDto {
+public class StaffDto {
     private String first_name;
     private String last_name;
     private byte[] picture;

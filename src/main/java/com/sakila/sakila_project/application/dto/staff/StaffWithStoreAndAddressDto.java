@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ExtendedStaffDto extends BaseStaffDto {
+public class StaffWithStoreAndAddressDto extends StaffDto {
     private StoreDto store;
     private AddressDto address;
 }
