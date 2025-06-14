@@ -1,9 +1,9 @@
 package com.sakila.sakila_project.infrastructure.adapters.input.rest;
 
-import com.sakila.sakila_project.application.dto.BaseActorDto;
+import com.sakila.sakila_project.application.dto.actor.RequestActorDto;
 import com.sakila.sakila_project.application.maps.ActorDtoMapper;
 import com.sakila.sakila_project.application.maps.BaseDtoMapper;
-import com.sakila.sakila_project.domain.ports.output.IEmailService;
+import com.sakila.sakila_project.domain.ports.output.services.IEmailService;
 import com.sakila.sakila_project.domain.ports.output.repositories.sakila.ActorRepository;
 import com.sakila.sakila_project.domain.ports.output.repositories.sakila.FilmRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,7 +98,7 @@ public class ActorController {
 
 
     @PostMapping("/auth/createActor")
-    public ResponseEntity<?> createActor(@RequestBody BaseActorDto actor) {
+    public ResponseEntity<?> createActor(@RequestBody RequestActorDto actor) {
         try{
 
             var map = this.minimalDtoMapper.toActor(actor);
@@ -112,7 +112,7 @@ public class ActorController {
     }
 
     @PutMapping("/auth/updateActor")
-    public ResponseEntity<?> updateActor(@RequestBody BaseActorDto actor,
+    public ResponseEntity<?> updateActor(@RequestBody RequestActorDto actor,
                                       @RequestParam int id) {
         try{
 
