@@ -10,6 +10,6 @@ import java.util.Optional;
 @Repository
 public interface FilmRepository extends JpaRepository<Film, Integer> {
 
-    @Query("SELECT f FROM film f JOIN FETCH f.language JOIN FETCH f.actors WHERE f.id = :id")
+    @Query("SELECT f FROM film f JOIN FETCH f.language JOIN FETCH f.actors JOIN FETCH f.categories WHERE f.id = :id")
     Optional<Film> findFilmById(int id);
 }
