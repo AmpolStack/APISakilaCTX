@@ -1,9 +1,10 @@
-package com.sakila.sakila_project.infrastructure.adapters.output;
+package com.sakila.sakila_project.infrastructure.adapters.output.services;
 
-import com.sakila.sakila_project.domain.ports.output.ICacheService;
+import com.sakila.sakila_project.domain.ports.output.services.ICacheService;
 import com.sakila.sakila_project.domain.results.Error;
 import com.sakila.sakila_project.domain.results.ErrorType;
 import com.sakila.sakila_project.domain.results.Result;
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
